@@ -95,7 +95,7 @@ export const HeroBanner = () => {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-6">
                 <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-md border border-white/10">
-                  <span className="text-[10px] font-black text-white uppercase tracking-tighter flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-white uppercase tracking-wide flex items-center gap-2">
                     <Play className="h-2 w-2 fill-white" /> LIMITED TIME OFFER
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export const HeroBanner = () => {
           </div>
 
           {/* Right Side Movie Details */}
-          <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
+          {/* <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
             <h2 className="text-[72px] font-black text-white tracking-tighter uppercase italic drop-shadow-2xl opacity-90">
               {slides[current].movieTitle}
             </h2>
@@ -136,7 +136,31 @@ export const HeroBanner = () => {
               <Play className="h-4 w-4 fill-white" />
               Book Tickets
             </button>
-          </div>
+          </div> */}
+          <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
+
+  <h2 className="text-[68px] font-extrabold text-white uppercase leading-none tracking-normal drop-shadow-xl">
+    {slides[current].movieTitle}
+  </h2>
+
+  <div className="flex items-center gap-4 mt-4 text-white/90 font-semibold text-[12px] uppercase tracking-[2px]">
+    
+    <span>
+      {slides[current].genres}
+    </span>
+
+    <span className="border border-white/20 px-2 py-1 rounded-md text-[10px] bg-black/40">
+      {slides[current].rating}
+    </span>
+
+  </div>
+
+  <button className="mt-8 bg-[#0055FF] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl">
+    <Play className="h-4 w-4 fill-white" />
+    Book Tickets
+  </button>
+
+</div>
         </motion.div>
       </AnimatePresence>
 
