@@ -110,7 +110,7 @@ export default function Home() {
 
       {/* Trending Section */}
       {/* Trending Section */}
-      <section className="container-max">
+      <section className="container-max footer-gradient pt-10">
         <SectionHeader 
           title="Trending Near You" 
           viewAllLink="/events" 
@@ -159,7 +159,7 @@ export default function Home() {
 
               {/* Date Badge - Calendar Style */}
               <div className="absolute -top-5 -right-5 bg-white rounded-[14px] shadow-[0_15px_30px_rgba(37,99,235,0.15)] overflow-hidden z-30 transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border border-blue-50/50">
-                <div className="bg-blue-600 px-3 py-1.5 flex items-center justify-center">
+                <div className="bg-[#2563EB] px-3 py-1.5 flex items-center justify-center">
                   <span className="text-[10px] font-black text-white uppercase tracking-[0.1em] leading-none">
                     {item.month}
                   </span>
@@ -179,12 +179,12 @@ export default function Home() {
             <BrowseCategories />
          </div>
 
-         <div className="py-16">
+         <div className="pb-16">
             <TopOffers />
          </div>
 
          {/* Club Banner */}
-         <section className="container-max py-20">
+         <section className="container-max">
             <div className="w-full max-w-7xl mx-auto ">
                <div className="w-full banner-gradient rounded-[24px] pl-8 md:pl-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-2xl border border-white/5">
 
@@ -206,7 +206,7 @@ export default function Home() {
                      <motion.button 
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="bg-white text-[#0F172A] px-10 py-4 rounded-2xl font-black text-base hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] transition-all duration-300"
+                        className="bg-white text-black px-10 py-4 rounded-2xl font-black text-base hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] transition-all duration-300"
                      >
                         Join Now – It's Free!
                      </motion.button>
@@ -230,12 +230,12 @@ export default function Home() {
          </section>
 
          {/* Explore More Section */}
-      <section className="container-max py-20 border-t border-gray-50">
+      <section className="container-max py-16 border-t border-gray-50">
         <SectionHeader 
           title="Explore More" 
           viewAllLink="/explore" 
         />
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 pt-10">
                {['Concerts', 'Plays', 'Sports', 'Workshops', 'Family Activities'].map((title, i) => {
                   const localImages = ['/image1.jpg', '/image2.jpg', '/classicmovie.jpg', '/chhava3.jpg', '/chhava4.jpg'];
                   return (

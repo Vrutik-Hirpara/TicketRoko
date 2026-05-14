@@ -82,7 +82,7 @@ const offers = [
     subtitle: "Up to ₹100",
     description: "On Movies & Events",
     code: "ROKO20",
-    bg: "bg-gradient-to-br from-[#EEF3FF] to-[#DBE7FF]",
+    bg: "bg-gradient-to-br from-[#DCE4FA] to-[#BCCBEF]",
     titleColor: "text-[#1E40AF]",
     subtitleColor: "text-[#2563EB]",
     button: "bg-[#2563EB]",
@@ -123,7 +123,7 @@ export const TopOffers = () => {
     />
 
     {/* Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10">
 
       {offers.map((offer, idx) => (
         <motion.div

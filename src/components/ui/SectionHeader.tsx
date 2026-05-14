@@ -20,7 +20,7 @@ export const SectionHeader = ({ title, viewAllLink, icon, className = "" }: Sect
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`flex   items-center justify-between mb-8 ${className}`}
+      className={`flex   items-center justify-between ${className}`}
     >
       <div className="flex items-center gap-3">
         {/* Default blue bar or custom icon */}

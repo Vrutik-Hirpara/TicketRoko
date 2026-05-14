@@ -9,7 +9,7 @@ export const Footer = () => {
   return (
     <footer className="w-full footer-gradient border-t border-gray-100 pt-20 pb-10">
       {/* Features Row */}
-      <div className="container-max grid grid-cols-1 md:grid-cols-4 gap-12 ">
+      <div className="container-max grid grid-cols-1 md:grid-cols-4 gap-4">
         <FeatureItem
           icon="/Safe.svg"
           title="100% Safe Booking"
@@ -74,32 +74,47 @@ export const Footer = () => {
   );
 };
 
-const FeatureItem = ({ icon, title, desc }: { icon: string, title: string, desc: string }) => (
-  <div className="flex items-center gap-4">
-    <div className="p-2 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 w-12 h-12">
-      <Image
-        src={icon}
-        alt={title}
-        width={32}
-        height={32}
-        className="object-contain"
-        quality={100}
-        unoptimized
-        style={{ filter: 'invert(27%) sepia(91%) saturate(2352%) hue-rotate(211deg) brightness(95%) contrast(93%)' }}
-      />
+const FeatureItem = ({ icon, title, desc }: { icon: string, title: string, desc: string }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  
+  return (
+    <div 
+      className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-primary group cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-600/20"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="p-2 bg-[#F9FAFB] rounded-xl flex items-center justify-center shrink-0 w-12 h-12 group-hover:bg-white/20 transition-all duration-500">
+        <Image
+          src={icon}
+          alt={title}
+          width={32}
+          height={32}
+          className="object-contain transition-all duration-500"
+          quality={100}
+          unoptimized
+          style={{ 
+            filter: isHovered 
+              ? 'brightness(0) invert(1)' 
+              : 'invert(27%) sepia(91%) saturate(2352%) hue-rotate(211deg) brightness(95%) contrast(93%)' 
+          }}
+        />
+      </div>
+      <div>
+        <h5 className="font-bold text-[#111827] text-sm group-hover:text-white transition-colors duration-500">{title}</h5>
+        <p className="text-gray-400 text-xs group-hover:text-white/80 transition-colors duration-500">{desc}</p>
+      </div>
     </div>
-    <div>
-      <h5 className="font-bold text-[#111827] text-sm">{title}</h5>
-      <p className="text-gray-400 text-xs">{desc}</p>
-    </div>
-  </div>
-);
+  );
+};
+
+
+
 
 const FooterLinks = ({ links }: { links: string[] }) => (
   <ul className="space-y-2">
     {links.map((link) => (
       <li key={link}>
-        <Link href="#" className="text-gray-400 text-sm font-md hover:text-primary transition-colors">
+        <Link href="#" className="text-gray-400 text-sm font-md hover:text-primary transition-all link-underline inline-block">
           {link}
         </Link>
       </li>
@@ -139,3 +154,4 @@ const SocialIcon = ({ icon, color }: { icon: React.ReactNode, color: string }) =
     {icon}
   </Link>
 );
+

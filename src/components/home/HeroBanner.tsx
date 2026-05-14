@@ -60,7 +60,7 @@ export const HeroBanner = () => {
 
   return (
     <div className="container-max">
-      <div className="relative w-full h-[375px] rounded-[12px] overflow-hidden shadow-2xl bg-[#1A1A1A] my-8">        <AnimatePresence mode="wait">
+      <div className="relative w-full h-[375px] rounded-[12px] overflow-hidden shadow-2xl bg-black my-8">        <AnimatePresence mode="wait">
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
@@ -116,7 +116,7 @@ export const HeroBanner = () => {
 
               <div className="flex items-center gap-6 mt-12">
                 <button className="bg-white text-gray-900 px-8 py-3.5 rounded-xl font-black text-[14px] flex items-center gap-3 hover:scale-105 transition-all shadow-2xl group">
-                  Book Now <ChevronRight className="h-4 w-4 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                  Book Now <ChevronRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
                 </button>
                 <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">*T&C Apply*</span>
               </div>
@@ -124,19 +124,6 @@ export const HeroBanner = () => {
           </div>
 
           {/* Right Side Movie Details */}
-          {/* <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
-            <h2 className="text-[72px] font-black text-white tracking-tighter uppercase italic drop-shadow-2xl opacity-90">
-              {slides[current].movieTitle}
-            </h2>
-            <div className="flex items-center gap-4 mt-2 text-white/80 font-bold text-[13px] uppercase tracking-widest">
-              <span>{slides[current].genres}</span>
-              <span className="border border-white/30 px-2 py-0.5 rounded text-[10px] bg-black/40">{slides[current].rating}</span>
-            </div>
-            <button className="mt-8 bg-[#0055FF] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all border border-white/10 shadow-2xl">
-              <Play className="h-4 w-4 fill-white" />
-              Book Tickets
-            </button>
-          </div> */}
           <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
 
   <h2 className="text-[68px] font-extrabold text-white uppercase leading-none tracking-normal drop-shadow-xl">

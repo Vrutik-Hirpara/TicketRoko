@@ -39,7 +39,7 @@ export const BrowseCategories = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 pt-10"
         >
           {categories.map((cat) => (
             <motion.div

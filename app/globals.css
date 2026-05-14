@@ -31,9 +31,8 @@
 }
 
 .footer-gradient {
-  background: linear-gradient(to bottom right, var(--footer-bg-from), var(--footer-bg-via), var(--footer-bg-to));
+  background: linear-gradient(to bottom right, #eff6ff, #dbeafe, #bfdbfe);
 }
-
 @layer base {
   body {
     background-color: white;
@@ -91,4 +90,26 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@layer utilities {
+  .link-underline {
+    position: relative;
+    padding-bottom: 2px;
+  }
+  
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary-blue);
+    transition: width 0.3s ease-in-out;
+  }
+  
+  .link-underline:hover::after {
+    width: 100%;
+  }
 }
