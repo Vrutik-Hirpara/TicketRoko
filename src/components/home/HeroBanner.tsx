@@ -92,7 +92,12 @@ export const HeroBanner = () => {
             {/* Pattern Overlay */}
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
-            <div className="relative z-10">
+            <motion.div 
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              className="relative z-10"
+            >
               <div className="flex items-center gap-2 mb-6">
                 <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-md border border-white/10">
                   <span className="text-[11px] font-bold text-white uppercase tracking-wide flex items-center gap-2">
@@ -120,34 +125,39 @@ export const HeroBanner = () => {
                 </button>
                 <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">*T&C Apply*</span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Side Movie Details */}
           <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+              className="flex flex-col items-center"
+            >
+              <h2 className="text-[68px] font-extrabold text-white uppercase leading-none tracking-normal drop-shadow-xl">
+                {slides[current].movieTitle}
+              </h2>
 
-  <h2 className="text-[68px] font-extrabold text-white uppercase leading-none tracking-normal drop-shadow-xl">
-    {slides[current].movieTitle}
-  </h2>
+              <div className="flex items-center gap-4 mt-4 text-white/90 font-semibold text-[12px] uppercase tracking-[2px]">
+                
+                <span>
+                  {slides[current].genres}
+                </span>
 
-  <div className="flex items-center gap-4 mt-4 text-white/90 font-semibold text-[12px] uppercase tracking-[2px]">
-    
-    <span>
-      {slides[current].genres}
-    </span>
+                <span className="border border-white/20 px-2 py-1 rounded-md text-[10px] bg-black/40">
+                  {slides[current].rating}
+                </span>
 
-    <span className="border border-white/20 px-2 py-1 rounded-md text-[10px] bg-black/40">
-      {slides[current].rating}
-    </span>
+              </div>
 
-  </div>
-
-  <button className="mt-8 bg-[#0055FF] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl">
-    <Play className="h-4 w-4 fill-white" />
-    Book Tickets
-  </button>
-
-</div>
+              <button className="mt-8 bg-[#0055FF] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl">
+                <Play className="h-4 w-4 fill-white" />
+                Book Tickets
+              </button>
+            </motion.div>
+          </div>
         </motion.div>
       </AnimatePresence>
 
