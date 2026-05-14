@@ -16,7 +16,7 @@ export const Footer = () => {
           desc="Secure & hassle-free transactions"
         />
         <FeatureItem
-          icon="/InstantConfirmation.svg"
+          icon="/instantConfirmation.svg"
           title="Instant Confirmation"
           desc="Get your tickets in seconds"
         />

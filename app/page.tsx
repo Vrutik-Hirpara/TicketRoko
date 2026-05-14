@@ -21,10 +21,10 @@ export default function Home() {
       <RecommendedMovies />
 
       <TrendingEvents />
-      <div className="py-16">
+      <div className="">
         <BrowseCategories />
       </div>
-      <div className="pb-16">
+      <div className="">
         <TopOffers />
       </div>
 
