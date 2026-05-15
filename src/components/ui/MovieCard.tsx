@@ -25,7 +25,7 @@ export const MovieCard = ({
       className="relative aspect-[3.5/4.5] cursor-pointer bg-white rounded-[12px] shadow-sm hover:shadow-2xl transition-all duration-700 overflow-hidden border border-gray-100"
     >
       {/* Background Image Layer */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-gray-200">
         <motion.div 
           initial={false}
           animate={{

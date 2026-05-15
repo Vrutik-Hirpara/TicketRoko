@@ -13,7 +13,7 @@ import { BrowseCategories } from "@/src/components/home/BrowseCategories";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white pt-[76px]">
+    <main className=" min-h-screen bg-white pt-[76px]">
       <CategoryNav />
 
       <HeroBanner />
@@ -21,7 +21,7 @@ export default function Home() {
       <RecommendedMovies />
 
       <TrendingEvents />
-      <div className="">
+      <div className="pt-10">
         <BrowseCategories />
       </div>
       <div className="">

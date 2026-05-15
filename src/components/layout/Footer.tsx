@@ -66,7 +66,7 @@ export const Footer = () => {
 
       {/* Copyright */}
       <div className="container-max text-center pt-10 border-t border-gray-200/60">
-        <p className="text-sm text-gray-500 font-medium tracking-wide">
+        <p className="text-sm text-gray-800 font-medium tracking-wide">
           © 2025 TicketRoko. Built for the best experience. All rights reserved.
         </p>
       </div>
@@ -101,7 +101,7 @@ const FeatureItem = ({ icon, title, desc }: { icon: string, title: string, desc:
       </div>
       <div>
         <h5 className="font-bold text-[#111827] text-sm group-hover:text-white transition-colors duration-500">{title}</h5>
-        <p className="text-gray-400 text-xs group-hover:text-white/80 transition-colors duration-500">{desc}</p>
+        <p className="text-gray-800 text-xs group-hover:text-white/80 transition-colors duration-500">{desc}</p>
       </div>
     </div>
   );
@@ -114,7 +114,7 @@ const FooterLinks = ({ links }: { links: string[] }) => (
   <ul className="space-y-2">
     {links.map((link) => (
       <li key={link}>
-        <Link href="#" className="text-gray-400 text-sm font-md hover:text-primary transition-all link-underline inline-block">
+        <Link href="#" className="text-gray-800 text-sm font-md  transition-all link-underline inline-block">
           {link}
         </Link>
       </li>

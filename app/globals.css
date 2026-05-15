@@ -30,9 +30,11 @@
   background: linear-gradient(to bottom right, #0c4bb0, #c5c9d0);
 }
 
-.footer-gradient {
+/* .footer-gradient {
   background: linear-gradient(to bottom right, #eff6ff, #dbeafe, #bfdbfe);
-}
+} */
+ .footer-gradient {
+background: linear-gradient(to top left, #315dd8, #4568dc, #2563eb, #3b82f6, #5a9eff, #7cb3ff, #9ec8ff, #bfdfff, #e0efff, #f0f5ff);}
 @layer base {
   body {
     background-color: white;

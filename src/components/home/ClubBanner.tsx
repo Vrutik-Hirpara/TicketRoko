@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 export const ClubBanner = () => {
   return (
-    <section className="container-max pb-20">
+    <section className="container-max ">
       <div className="w-full max-w-7xl mx-auto ">
         <div className="w-full banner-gradient rounded-[24px] pl-8 md:pl-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-2xl border border-white/5">
 
