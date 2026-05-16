@@ -1,9 +1,6 @@
 "use client";
 import React from "react";
-import { Navbar } from "../src/components/layout/Navbar";
-import { CategoryNav } from "../src/components/layout/CategoryNav";
 import { HeroBanner } from "../src/components/home/HeroBanner";
-import { Footer } from "../src/components/layout/Footer";
 import { TopOffers } from "../src/components/home/TopOffers";
 import { RecommendedMovies } from "../src/components/home/RecommendedMovies";
 import { TrendingEvents } from "../src/components/home/TrendingEvents";
@@ -13,9 +10,7 @@ import { BrowseCategories } from "@/src/components/home/BrowseCategories";
 
 export default function Home() {
   return (
-    <main className=" min-h-screen bg-white pt-[76px]">
-      <CategoryNav />
-
+    <main className="">
       <HeroBanner />
 
       <RecommendedMovies />
@@ -31,8 +26,6 @@ export default function Home() {
       <ClubBanner />
 
       <ExploreMore />
-
-      <Footer />
     </main>
   );
 }

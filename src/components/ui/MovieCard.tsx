@@ -29,10 +29,10 @@ export const MovieCard = ({
         <motion.div 
           initial={false}
           animate={{
-            top: isHovered ? 0 : '35%',
+            top: isHovered ? 0 : '45%',
             right: isHovered ? 0 : 0,
             bottom: isHovered ? 0 : 0,
-            left: isHovered ? 0 : '40%',
+            left: isHovered ? 0 : '55%',
             borderRadius: isHovered ? 8 : 8,
           }}
           transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
@@ -62,22 +62,20 @@ export const MovieCard = ({
        
 
         {/* Content Layer */}
-        <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-10 pt-12">
+        <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-6 md:p-10 pt-8 md:pt-12">
           {/* Top Header */}
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-2 md:mb-4">
             <motion.span 
               animate={{ color: isHovered ? '#facc15' : '#B36B16' }}
-              className="text-[11px] font-black uppercase tracking-widest transition-colors"
+              className="text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-colors"
             >
               {genre.split(' • ')[0]}
             </motion.span>
-
-            
           </div>
 
           <motion.h3 
             animate={{ color: isHovered ? '#ffffff' : '#222222' }}
-            className="text-3xl font-black leading-[1.1] max-w-[90%]"
+            className="text-xl md:text-3xl font-black leading-[1.1] max-w-[85%] md:max-w-[90%]"
           >
             {title}
           </motion.h3>

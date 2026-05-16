@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Search, MapPin, Menu, X, ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Container } from '../ui/Container';
@@ -21,18 +22,20 @@ export const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'nav-blur shadow-lg' : 'bg-white border-b border-gray-100'}`}>
-      <Container className="flex items-center justify-between h-[72px]">
+      <Container className="flex items-center justify-between h-[64px] md:h-[72px]">
         {/* Logo */}
-        <div className="relative w-[180px] h-[40px] cursor-pointer flex-shrink-0">
-          <Image 
-            src="/TicketRoko_logo.png" 
-            alt="TicketRoko" 
-            fill 
-            priority
-            sizes="180px"
-            className="object-contain"
-          />
-        </div>
+        <Link href="/">
+          <div className="relative w-[140px] md:w-[180px] h-[32px] md:h-[40px] cursor-pointer flex-shrink-0">
+            <Image 
+              src="/TicketRoko_logo.png" 
+              alt="TicketRoko" 
+              fill 
+              priority
+              sizes="180px"
+              className="object-contain"
+            />
+          </div>
+        </Link>
 
         {/* Desktop Navigation */}
         {/* <div className="hidden lg:flex items-center flex-1  gap-8 justify-between">

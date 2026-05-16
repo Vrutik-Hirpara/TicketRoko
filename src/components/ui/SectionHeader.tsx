@@ -32,7 +32,7 @@ export const SectionHeader = ({ title, viewAllLink, icon, className = "" }: Sect
           <span className="w-1.5 h-10 bg-[#2563EB] rounded-full inline-block shadow-[0_0_15px_rgba(37,99,235,0.3)]"></span>
         )}
         
-        <h2 className="text-[28px] font-black text-[#111827] tracking-tight">
+        <h2 className="text-[18px] md:text-[28px] font-black text-[#111827] tracking-tight">
           {title}
         </h2>
       </div>

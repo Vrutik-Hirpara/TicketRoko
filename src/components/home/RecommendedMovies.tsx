@@ -42,7 +42,7 @@ export const RecommendedMovies = () => {
   };
 
   return (
-    <section className="container-max py-16">
+    <section className="container-max py-16 overflow-hidden">
       <SectionHeader 
         title="Recommended for You" 
         viewAllLink="/movies" 
@@ -59,13 +59,13 @@ export const RecommendedMovies = () => {
           visible: {
             opacity: 1,
             transition: {
-              staggerChildren: 0.1
+              staggerChildren: 0.7
             }
           }
         }}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, amount: 0.8 }}
         className={`flex gap-8 overflow-x-auto no-scrollbar pt-10 pb-10 px-4 -mx-4 cursor-grab active:cursor-grabbing select-none ${isDragging ? 'scroll-smooth-none' : ''}`}
       >
         {movies.map((movie, idx) => (
@@ -75,7 +75,7 @@ export const RecommendedMovies = () => {
               hidden: { opacity: 0, x: 50 },
               visible: { opacity: 1, x: 0 }
             }}
-            className={`flex-shrink-0 w-[340px] ${isDragging ? 'pointer-events-none' : ''}`}
+            className={`flex-shrink-0 w-[260px] md:w-[340px] ${isDragging ? 'pointer-events-none' : ''}`}
           >
             <MovieCard 
               title={movie.title}

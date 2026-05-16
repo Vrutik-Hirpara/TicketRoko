@@ -3,13 +3,13 @@ export const API_CONFIG = {
   TIMEOUT: 10000,
 };
 
-export const ROUTES = {
-  HOME: '/',
-  MOVIES: '/movies',
-  EVENTS: '/events',
-  PLAYS: '/plays',
-  SPORTS: '/sports',
-  ACTIVITIES: '/activities',
-  OFFERS: '/offers',
-  GIFT_CARDS: '/gift-cards',
-};
+// export const ROUTES = {
+//   HOME: '/',
+//   MOVIES: '/movies',
+//   EVENTS: '/events',
+//   PLAYS: '/plays',
+//   SPORTS: '/sports',
+//   ACTIVITIES: '/activities',
+//   OFFERS: '/offers',
+//   GIFT_CARDS: '/gift-cards',
+// };

@@ -15,14 +15,14 @@ export const ClubBanner = () => {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
           {/* Left Content */}
-          <div className="relative z-10 flex-1 text-center md:text-left">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
+          <div className="relative z-10 flex-1 text-center md:text-left pt-12 md:pt-0">
+            <h2 className="text-[24px] sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
               Join TicketRoko Club
             </h2>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/90 mb-6">
+            <h3 className="text-[18px] sm:text-3xl md:text-4xl font-bold text-white/90 mb-6">
               More Points. More Movies.
             </h3>
-            <p className="text-white/60 text-base md:text-lg mb-10 max-w-md mx-auto md:mx-0 font-medium">
+            <p className="text-white/60 text-[14px] md:text-lg mb-10 max-w-md mx-auto md:mx-0 font-medium px-4 md:px-0">
               Earn points on every booking and unlock exclusive rewards, early access, and special screenings.
             </p>
             <motion.button 
@@ -35,8 +35,8 @@ export const ClubBanner = () => {
           </div>
 
           {/* Right Image - Gift Card */}
-          <div className="relative z-10 mt-32 md:mt-24 ml-8 md:ml-14">
-            <div className="relative w-[360px] h-[260px] md:w-[430px] md:h-[340px]">
+          <div className="relative z-10 mt-10 md:mt-24 ml-0 md:ml-14">
+            <div className="relative w-[280px] h-[200px] md:w-[430px] md:h-[340px]">
               <Image
                 src="/giftcard.png"
                 alt="TicketRoko Club Card"

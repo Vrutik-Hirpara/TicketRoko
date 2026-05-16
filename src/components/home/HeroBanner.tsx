@@ -81,36 +81,48 @@ export const HeroBanner = () => {
             />
           </div>
 
-          {/* Sharp Slanted Content Side */}
+          {/* Content Side */}
           <div
-            className="relative z-20 h-full w-[50%] flex flex-col justify-center px-16 text-white overflow-hidden"
-            style={{
-              backgroundColor: slides[current].color,
-              clipPath: 'polygon(0 0, 85% 0, 70% 70%, 80% 100%, 0 100%)'
-            }}
+            className="hero-content-side relative z-20 h-full w-full xl:w-[50%] flex flex-col justify-end xl:justify-center px-6 md:px-16 pb-12 xl:pb-0 text-white overflow-hidden"
+            style={{ '--hero-color': slides[current].color } as any}
           >
             {/* Pattern Overlay */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+            <div className="absolute inset-0 opacity-10 z-0" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+            <style dangerouslySetInnerHTML={{ __html: `
+              @media (max-width: 1279px) {
+                .hero-content-side {
+                  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%) !important;
+                }
+              }
+              @media (min-width: 1280px) {
+                .hero-content-side {
+                  background-color: var(--hero-color) !important;
+                  clip-path: polygon(0 0, 92% 0, 78% 70%, 88% 100%, 0 100%) !important; 
+                }
+              }
+            `}} />
 
             <motion.div 
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
+              key={`content-${current}`}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               className="relative z-10"
             >
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-4 xl:mb-6">
                 <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-md border border-white/10">
-                  <span className="text-[11px] font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                  <span className="text-[10px] md:text-[11px] font-bold text-white uppercase tracking-wide flex items-center gap-2">
                     <Play className="h-2 w-2 fill-white" /> LIMITED TIME OFFER
                   </span>
                 </div>
               </div>
 
-              <h1 className="text-[44px] font-black leading-[1.05] tracking-tight whitespace-pre-line mb-4">
+              <h1 className="text-[24px] md:text-[36px] xl:text-[44px] font-black leading-[1.1] tracking-tight whitespace-pre-line mb-3 xl:mb-4">
                 {slides[current].title}
               </h1>
 
-              <p className="text-[18px] font-bold text-white/90">
+              <p className="text-[14px] md:text-[18px] font-bold text-white/90">
                 {slides[current].subtitle.split('20% OFF').map((part, i, arr) => (
                   <React.Fragment key={i}>
                     {part}
@@ -119,17 +131,17 @@ export const HeroBanner = () => {
                 ))}
               </p>
 
-              <div className="flex items-center gap-6 mt-12">
-                <button className="bg-white text-gray-900 px-8 py-3.5 rounded-xl font-black text-[14px] flex items-center gap-3 hover:scale-105 transition-all shadow-2xl group">
+              <div className="flex items-center gap-4 xl:gap-6 mt-8 xl:mt-12">
+                <button className="bg-white text-gray-900 px-6 md:px-8 py-2.5 md:py-3.5 rounded-xl font-black text-[12px] md:text-[14px] flex items-center gap-3 hover:scale-105 transition-all shadow-2xl group">
                   Book Now <ChevronRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
                 </button>
-                <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">*T&C Apply*</span>
+                <span className="text-[9px] md:text-[10px] text-white/40 font-bold tracking-widest uppercase">*T&C Apply*</span>
               </div>
             </motion.div>
           </div>
 
-          {/* Right Side Movie Details */}
-          <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden md:flex">
+          {/* Right Side Movie Details - Visible only on Desktop */}
+          <div className="relative z-20 flex-1 flex flex-col items-center justify-center pr-20 hidden xl:flex">
             <motion.div
               initial={{ x: 100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}

@@ -35,6 +35,13 @@
 } */
  .footer-gradient {
 background: linear-gradient(to top left, #315dd8, #4568dc, #2563eb, #3b82f6, #5a9eff, #7cb3ff, #9ec8ff, #bfdfff, #e0efff, #f0f5ff);}
+
+html, body {
+  overflow-x: clip;
+  max-width: 100%;
+  position: relative;
+}
+
 @layer base {
   body {
     background-color: white;
@@ -45,10 +52,16 @@ background: linear-gradient(to top left, #315dd8, #4568dc, #2563eb, #3b82f6, #5a
 }
 
 @layer components {
-  .container-max {
-    @apply mx-auto px-10 lg:px-[90px];
-    max-width: var(--container-width);
-  }
+ .container-max {
+  @apply mx-auto 
+         px-2 
+         sm:px-0 
+         md:px-6 
+         lg:px-8 
+         xl:px-[90px];
+
+  max-width: var(--container-width);
+}
 
   .nav-blur {
     @apply bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100;

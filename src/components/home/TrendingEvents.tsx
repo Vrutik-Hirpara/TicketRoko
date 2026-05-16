@@ -15,7 +15,7 @@ const trendingItems = [
 
 export const TrendingEvents = () => {
   return (
-    <section className="container-max footer-gradient pt-10">
+    <section className="container-max footer-gradient pt-10 overflow-hidden">
       <SectionHeader 
         title="Trending Near You" 
         viewAllLink="/events" 
@@ -33,18 +33,23 @@ export const TrendingEvents = () => {
         }}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, amount: 0.8 }}
         className="flex gap-8 overflow-x-auto no-scrollbar pt-10 pb-10 px-6"
       >
         {trendingItems.map((item, i) => (
           <motion.div 
             key={i} 
             variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 }
+              hidden: { opacity: 0, y: 40, scale: 0.9 },
+              visible: { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                transition: { duration: 0.6, ease: "easeOut" }
+              }
             }}
             whileHover={{ y: -10 }}
-            className="relative w-[300px] h-[210px] flex-shrink-0 group cursor-pointer"
+            className="relative w-[240px] md:w-[300px] h-[170px] md:h-[210px] flex-shrink-0 group cursor-pointer"
           >
             {/* Slanted Card Container */}
             <div className="w-full h-full rounded-[24px] overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-500 transform -skew-x-12 relative border border-white/50">

@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export const Footer = () => {
   return (
-    <footer className="w-full footer-gradient border-t border-gray-100 pt-20 pb-10">
+    <footer className="w-full footer-gradient border-t border-gray-100 pt-10 md:pt-20 pb-10">
       {/* Features Row */}
       <div className="container-max grid grid-cols-1 md:grid-cols-4 gap-4">
         <FeatureItem
@@ -33,11 +33,10 @@ export const Footer = () => {
       </div>
 
       {/* Links Row */}
-      <div className="container-max grid grid-cols-2 lg:grid-cols-5 gap-12 py-20">
-        <div className="space-y-6">
-          <h4 className="font-bold text-gray-900 text-lg">TicketRoko</h4>
-          <FooterLinks links={['About Us', 'Careers', 'Press', 'Blog']} />
-        </div>
+      <div className="container-max grid grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10 lg:gap-12 py-8 sm:py-10 md:py-14 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px]">        <div className="space-y-6">
+        <h4 className="font-bold text-gray-900 text-lg">TicketRoko</h4>
+        <FooterLinks links={['About Us', 'Careers', 'Press', 'Blog']} />
+      </div>
         <div className="space-y-6">
           <h4 className="font-bold text-gray-900 text-lg">Help</h4>
           <FooterLinks links={['FAQs', 'Cancellation Policy', 'Refund Policy', 'Contact Us']} />
@@ -65,10 +64,9 @@ export const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="container-max text-center pt-10 border-t border-gray-200/60">
-        <p className="text-sm text-gray-800 font-medium tracking-wide">
-          © 2025 TicketRoko. Built for the best experience. All rights reserved.
-        </p>
+      <div className="container-max text-center pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px] border-t border-gray-200/60">        <p className="text-sm text-gray-800 font-medium tracking-wide">
+        © 2025 TicketRoko. Built for the best experience. All rights reserved.
+      </p>
       </div>
     </footer>
   );
@@ -76,9 +74,9 @@ export const Footer = () => {
 
 const FeatureItem = ({ icon, title, desc }: { icon: string, title: string, desc: string }) => {
   const [isHovered, setIsHovered] = React.useState(false);
-  
+
   return (
-    <div 
+    <div
       className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-primary group cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-600/20"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -92,10 +90,10 @@ const FeatureItem = ({ icon, title, desc }: { icon: string, title: string, desc:
           className="object-contain transition-all duration-500"
           quality={100}
           unoptimized
-          style={{ 
-            filter: isHovered 
-              ? 'brightness(0) invert(1)' 
-              : 'invert(27%) sepia(91%) saturate(2352%) hue-rotate(211deg) brightness(95%) contrast(93%)' 
+          style={{
+            filter: isHovered
+              ? 'brightness(0) invert(1)'
+              : 'invert(27%) sepia(91%) saturate(2352%) hue-rotate(211deg) brightness(95%) contrast(93%)'
           }}
         />
       </div>
