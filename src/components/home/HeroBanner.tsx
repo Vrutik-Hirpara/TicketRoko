@@ -59,8 +59,8 @@ export const HeroBanner = () => {
   }, []);
 
   return (
-    <div className="container-max">
-      <div className="relative w-full h-[375px] rounded-[12px] overflow-hidden shadow-2xl bg-black my-8">        <AnimatePresence mode="wait">
+    <div className="container-max py-8">
+      <div className="relative w-full h-[375px] rounded-[12px] overflow-hidden shadow-2xl bg-black ">        <AnimatePresence mode="wait">
         <motion.div
           key={current}
           initial={{ opacity: 0 }}

@@ -42,7 +42,7 @@ export const RecommendedMovies = () => {
   };
 
   return (
-    <section className="container-max py-16 overflow-hidden">
+    <section className="container-max py-10 overflow-hidden">
       <SectionHeader 
         title="Recommended for You" 
         viewAllLink="/movies" 

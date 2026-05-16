@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export const Footer = () => {
   return (
-    <footer className="w-full footer-gradient border-t border-gray-100 pt-10 md:pt-20 pb-10">
+    <footer className="w-full footer-gradient border-t border-gray-100 md:pt-20">
       {/* Features Row */}
       <div className="container-max grid grid-cols-1 md:grid-cols-4 gap-4">
         <FeatureItem
@@ -33,7 +33,7 @@ export const Footer = () => {
       </div>
 
       {/* Links Row */}
-      <div className="container-max grid grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10 lg:gap-12 py-8 sm:py-10 md:py-14 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px]">        <div className="space-y-6">
+      <div className="container-max grid grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10 lg:gap-12 py-4 sm:py-6 md:py-8 lg:py-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px]">        <div className="space-y-6">
         <h4 className="font-bold text-gray-900 text-lg">TicketRoko</h4>
         <FooterLinks links={['About Us', 'Careers', 'Press', 'Blog']} />
       </div>
@@ -64,7 +64,7 @@ export const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="container-max text-center pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px] border-t border-gray-200/60">        <p className="text-sm text-gray-800 font-medium tracking-wide">
+      <div className="container-max text-center py-4 sm:py-4 md:py-6 lg:py-8 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[90px] border-t border-gray-200/60">        <p className="text-sm text-gray-800 font-medium tracking-wide">
         © 2025 TicketRoko. Built for the best experience. All rights reserved.
       </p>
       </div>
