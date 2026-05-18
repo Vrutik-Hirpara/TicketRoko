@@ -16,10 +16,10 @@ interface SectionHeaderProps {
 export const SectionHeader = ({ title, viewAllLink, icon, className = "" }: SectionHeaderProps) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      // initial={{ opacity: 0, x: -20 }}
+      // whileInView={{ opacity: 1, x: 0 }}
+      // viewport={{ once: true, margin: "-50px" }}
+      // transition={{ duration: 0.6, ease: "easeOut" }}
       className={`flex   items-center justify-between ${className}`}
     >
       <div className="flex items-center gap-3">

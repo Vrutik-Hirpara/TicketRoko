@@ -281,21 +281,21 @@ export const BrowseCategories = () => {
               key={cat.name}
               initial="initial"
               whileHover="hover"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-                hover: { y: -8 }
-              }}
-              // આ ટ્રાન્ઝિશન કાર્ડના ઉપર-નીચે જવાને સ્મૂથ રાખશે (બંને બાજુ)
-              transition={{ duration: 0.4, ease: "easeInOut" }}
+              // variants={{
+              //   hidden: { opacity: 0, y: 20 },
+              //   visible: { opacity: 1, y: 0 },
+              //   hover: { y: -8 }
+              // }}
+              // // આ ટ્રાન્ઝિશન કાર્ડના ઉપર-નીચે જવાને સ્મૂથ રાખશે (બંને બાજુ)
+              // transition={{ duration: 0.4, ease: "easeInOut" }}
               className="group cursor-pointer"
             >
               <div className={`${cat.bgBoxColor} rounded-xl border border-transparent hover:border-gray-200 shadow-sm hover:shadow-md transition-all duration-500 py-4 flex flex-col items-center justify-center`}>
 
                 <motion.div 
-                  variants={iconVariants}
-                  // અહીં ટ્રાન્ઝિશન આપવાથી તે રિવર્સ અને ફોરવર્ડ બંને વખતે સેમ સ્મૂથનેસ રાખશે
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  // variants={iconVariants}
+                  // // અહીં ટ્રાન્ઝિશન આપવાથી તે રિવર્સ અને ફોરવર્ડ બંને વખતે સેમ સ્મૂથનેસ રાખશે
+                  // transition={{ duration: 0.6, ease: "easeInOut" }}
                   className={`w-20 h-20 ${cat.bgColor} rounded-full mb-4 flex items-center justify-center shadow-inner`}
                 >
                   <div className="relative w-10 h-10">

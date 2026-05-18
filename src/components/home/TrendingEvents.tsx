@@ -22,15 +22,15 @@ export const TrendingEvents = () => {
       />
 
       <motion.div 
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.1
-            }
-          }
-        }}
+        // variants={{
+        //   hidden: { opacity: 0 },
+        //   visible: {
+        //     opacity: 1,
+        //     transition: {
+        //       staggerChildren: 0.1
+        //     }
+        //   }
+        // }}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.8 }}
@@ -39,15 +39,15 @@ export const TrendingEvents = () => {
         {trendingItems.map((item, i) => (
           <motion.div 
             key={i} 
-            variants={{
-              hidden: { opacity: 0, y: 40, scale: 0.9 },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1,
-                transition: { duration: 0.6, ease: "easeOut" }
-              }
-            }}
+            // variants={{
+            //   hidden: { opacity: 0, y: 40, scale: 0.9 },
+            //   visible: { 
+            //     opacity: 1, 
+            //     y: 0, 
+            //     scale: 1,
+            //     transition: { duration: 0.6, ease: "easeOut" }
+            //   }
+            // }}
             whileHover={{ y: -10 }}
             className="relative w-[240px] md:w-[300px] h-[170px] md:h-[210px] flex-shrink-0 group cursor-pointer"
           >

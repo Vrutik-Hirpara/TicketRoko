@@ -48,7 +48,7 @@ export const RecommendedMovies = () => {
         viewAllLink="/movies" 
       />
 
-      <motion.div 
+      {/* <motion.div 
         ref={scrollRef}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -84,7 +84,48 @@ export const RecommendedMovies = () => {
             />
           </motion.div>
         ))}
-      </motion.div>
+      </motion.div> */}
+      <motion.div
+  ref={scrollRef}
+  onMouseDown={handleMouseDown}
+  onMouseUp={handleMouseUp}
+  onMouseLeave={handleMouseUp}
+  onMouseMove={handleMouseMove}
+  // variants={{
+  //   hidden: { opacity: 0 },
+  //   visible: {
+  //     opacity: 1,
+  //     transition: {
+  //       staggerChildren: 0.7
+  //     }
+  //   }
+  // }}
+  // initial="hidden"
+  // whileInView="visible"
+  // viewport={{ once: true, amount: 0.8 }}
+  className={`flex gap-4 overflow-x-auto no-scrollbar pt-10 pb-10 px-4 -mx-4 cursor-grab active:cursor-grabbing select-none ${
+    isDragging ? 'scroll-smooth-none' : ''
+  }`}
+>
+  {movies.map((movie, idx) => (
+    <motion.div
+      key={idx}
+      // variants={{
+      //   hidden: { opacity: 0, x: 50 },
+      //   visible: { opacity: 1, x: 0 }
+      // }}
+      className={`flex-shrink-0 w-[250px] md:w-[265px] ${
+        isDragging ? 'pointer-events-none' : ''
+      }`}
+    >
+      <MovieCard
+        title={movie.title}
+        genre={movie.genre}
+        imageUrl={movie.imageUrl}
+      />
+    </motion.div>
+  ))}
+</motion.div>
     </section>
   );
 };
