@@ -81,10 +81,7 @@ export const MovieCard = ({
           className="object-cover"
         />
 
-        {/* Heart */}
-        <button className="absolute top-3 right-3 z-10">
-          <Heart className="w-7 h-7 text-white" />
-        </button>
+    
       </div>
 
       {/* CONTENT */}
@@ -103,10 +100,10 @@ export const MovieCard = ({
         <div className="flex items-center justify-between">
           {/* Rating */}
           <div className="flex items-center gap-1">
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+            {/* <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
             <span className="text-[16px] font-medium text-black">
               8.2
-            </span>
+            </span> */}
           </div>
 
           {/* Language */}

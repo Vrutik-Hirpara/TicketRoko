@@ -50,7 +50,7 @@ export const RecommendedMovies = () => {
     <section className="container-max py-10 overflow-hidden">
       <SectionHeader
         title="Recommended for You"
-        viewAllLink="/movies"
+        viewAllLink="/events"
       />
 
       <motion.div
