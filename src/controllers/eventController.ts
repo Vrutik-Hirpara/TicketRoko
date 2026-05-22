@@ -64,12 +64,12 @@ export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPag
   }
 );
 
-// Event Detail page — fetch single event by numeric ID
-export const fetchEventById = createAsyncThunk<EventData, number>(
-  'eventDetail/fetchById',
-  async (id, { rejectWithValue }) => {
+// Event Detail page — fetch single event by slug
+export const fetchEventBySlug = createAsyncThunk<EventData, string>(
+  'eventDetail/fetchBySlug',
+  async (slug, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/events/${id}`);
+      const response = await fetch(`${BASE_URL}/events/${slug}`);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.success && result.data) return result.data as EventData;
@@ -92,6 +92,22 @@ export const fetchTrendingEvents = createAsyncThunk<EventData[], void>(
       return rejectWithValue('Unexpected response format');
     } catch (error: any) {
       return rejectWithValue(error.message || 'Network error fetching trending events');
+    }
+  }
+);
+
+// Fetch specific trending event detail by slug from /events/trending/:slug
+export const fetchTrendingEventBySlug = createAsyncThunk<EventData, string>(
+  'eventDetail/fetchTrendingBySlug',
+  async (slug, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/events/trending/${slug}`);
+      if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
+      const result = await response.json();
+      if (result.success && result.data) return result.data as EventData;
+      return rejectWithValue('Unexpected response format');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Network error fetching trending event detail');
     }
   }
 );

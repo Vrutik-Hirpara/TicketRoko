@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { getFullImageUrl } from '../../utils/constants';
 
 /**
  * REUSABLE UI COMPONENT: MovieCard
@@ -14,23 +15,31 @@ import { motion } from 'framer-motion';
 
 interface MovieCardProps {
   id: number;
+  slug: string;
   title: string;
   description?: string;
   imageUrl?: string | null;
   language?: string;
+  onClick?: () => void;
 }
 
 export const MovieCard = ({
   id,
+  slug,
   title,
   description,
   imageUrl,
   language,
+  onClick,
 }: MovieCardProps) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/events/${id}`);
+    if (onClick) {
+      onClick();
+    } else {
+      router.push(`/events/${slug}`);
+    }
   };
 
   return (
@@ -43,7 +52,7 @@ export const MovieCard = ({
       {/* IMAGE */}
       <div className="relative w-[238px] h-[161px] rounded-[16px] overflow-hidden">
         <Image
-          src={imageUrl || '/placeholder.jpg'}
+          src={getFullImageUrl(imageUrl)}
           alt={title}
           fill
           sizes="246px"

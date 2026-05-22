@@ -55,15 +55,15 @@ export const TrendingEvents = () => {
     scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
-  const handleCardClick = (id: number) => {
+  const handleCardClick = (slug: string) => {
     if (!hasDraggedRef.current) {
-      router.push(`/events/${id}`);
+      router.push(`/events/trending/${slug}`);
     }
   };
 
   return (
     <section className="container-max py-10 overflow-hidden">
-      <SectionHeader title="Trending Near You" viewAllLink="/events?filter=trending" />
+      <SectionHeader title="Trending Near You" viewAllLink="/events/trending" />
 
       <div
         ref={scrollRef}
@@ -103,14 +103,15 @@ export const TrendingEvents = () => {
             <div
               key={event.id}
               className="flex-shrink-0 w-[246px]"
-              onClick={() => handleCardClick(event.id)}
             >
               <MovieCard
                 id={event.id}
+                slug={event.slug}
                 title={event.title}
                 description={event.description}
                 imageUrl={event.banner_url}
                 language={event.language}
+                onClick={() => handleCardClick(event.slug)}
               />
             </div>
           ))

@@ -52,9 +52,9 @@ export const RecommendedMovies = () => {
     scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
-  const handleCardClick = (id: number) => {
+  const handleCardClick = (slug: string) => {
     if (!hasDraggedRef.current) {
-      router.push(`/events/${id}`);
+      router.push(`/events/${slug}`);
     }
   };
 
@@ -99,14 +99,15 @@ export const RecommendedMovies = () => {
             <div
               key={movie.id}
               className="flex-shrink-0 w-[246px]"
-              onClick={() => handleCardClick(movie.id)}
             >
               <MovieCard
                 id={movie.id}
+                slug={movie.slug}
                 title={movie.title}
                 description={movie.description}
                 imageUrl={movie.banner_url}
                 language={movie.language}
+                onClick={() => handleCardClick(movie.slug)}
               />
             </div>
           ))

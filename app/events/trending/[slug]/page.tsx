@@ -6,14 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, MapPin, Tag, Ticket, Users, ChevronLeft } from 'lucide-react';
-import { UPLOADS_URL, getFullImageUrl } from '../../../src/utils/constants';
-import { AppDispatch, RootState } from '../../../src/store';
-import { fetchEventBySlug } from '../../../src/controllers/eventController';
-import { clearEventDetail } from '../../../src/store/eventDetailSlice';
+import { UPLOADS_URL, getFullImageUrl } from '../../../../src/utils/constants';
+import { AppDispatch, RootState } from '../../../../src/store';
+import { fetchTrendingEventBySlug } from '../../../../src/controllers/eventController';
+import { clearEventDetail } from '../../../../src/store/eventDetailSlice';
 
-// ══════════ REUSABLE ATOMS & COMPONENTS ══════════
+// ══════════ REUSABLE ATOMS ══════════
 
-// 1. Reusable Animated Booking CTA Button
 function BookTicketsButton({ fullWidth = false }: { fullWidth?: boolean }) {
   return (
     <motion.button
@@ -29,30 +28,28 @@ function BookTicketsButton({ fullWidth = false }: { fullWidth?: boolean }) {
   );
 }
 
-// 2. Reusable Event Poster Component (with Trailer Overlay & In cinemas bar)
 function EventPoster({ src, title, mobile = false }: { src: string; title: string; mobile?: boolean }) {
   return (
-    <motion.div 
+    <motion.div
       initial={mobile ? { opacity: 0, scale: 0.92 } : undefined}
       animate={mobile ? { opacity: 1, scale: 1 } : undefined}
       transition={{ duration: 0.4 }}
       className={`relative rounded-xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-105 ${
         mobile ? 'w-[200px] h-[290px] flex-shrink-0' : 'w-[220px] h-[320px] md:w-[240px] md:h-[350px]'
       }`}
-      style={{ 
+      style={{
         border: '1.5px solid rgba(255, 255, 255, 0.25)',
         boxShadow: '0 20px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(255, 255, 255, 0.05)'
       }}
     >
       <Image src={src} alt={title} fill sizes={mobile ? '200px' : '240px'} className="object-cover" priority />
-      
-      {/* Trailer button */}
+
       <div className="absolute bottom-10 left-0 right-0 flex justify-center">
-        <span 
-          className="text-[11px] font-bold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all hover:scale-105" 
-          style={{ 
-            background: 'rgba(0, 0, 0, 0.72)', 
-            color: 'var(--white)', 
+        <span
+          className="text-[11px] font-bold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all hover:scale-105"
+          style={{
+            background: 'rgba(0, 0, 0, 0.72)',
+            color: 'var(--white)',
             border: '1.5px solid rgba(255, 255, 255, 0.25)',
             boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
           }}
@@ -61,12 +58,11 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         </span>
       </div>
 
-      {/* In cinemas bottom strip */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 text-center text-[11px] font-bold py-2" 
-        style={{ 
-          background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 100%)', 
-          color: 'var(--white)' 
+      <div
+        className="absolute bottom-0 left-0 right-0 text-center text-[11px] font-bold py-2"
+        style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 100%)',
+          color: 'var(--white)'
         }}
       >
         In cinemas
@@ -75,10 +71,9 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
   );
 }
 
-// 3. Reusable Thumbs-Up Interest Rating Box
 function InterestBox({ label, mobile = false }: { label: string; mobile?: boolean }) {
   return (
-    <div 
+    <div
       className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
         mobile ? 'w-full px-4 py-3' : 'gap-4 px-4 py-3 self-start'
       }`}
@@ -93,7 +88,7 @@ function InterestBox({ label, mobile = false }: { label: string; mobile?: boolea
           </p>
         </div>
       </div>
-      <button 
+      <button
         className="text-[11px] font-semibold px-2.5 py-1 rounded transition hover:bg-white/10"
         style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
       >
@@ -103,9 +98,9 @@ function InterestBox({ label, mobile = false }: { label: string; mobile?: boolea
   );
 }
 
-// ══════════ MAIN EVENT DETAIL VIEW ══════════
+// ══════════ MAIN TRENDING EVENT DETAIL VIEW ══════════
 
-export default function EventDetailPage() {
+export default function TrendingEventDetailPage() {
   const params = useParams();
   const router = useRouter();
   const eventSlug = params?.slug as string;
@@ -113,7 +108,7 @@ export default function EventDetailPage() {
   const { event, loading, error } = useSelector((state: RootState) => state.eventDetail);
 
   useEffect(() => {
-    if (eventSlug) dispatch(fetchEventBySlug(eventSlug));
+    if (eventSlug) dispatch(fetchTrendingEventBySlug(eventSlug));
     return () => { dispatch(clearEventDetail()); };
   }, [eventSlug, dispatch]);
 
@@ -127,9 +122,10 @@ export default function EventDetailPage() {
     return dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
+// Using shared utility to resolve image URLs
+
   const availableTickets = event ? event.total_tickets - event.sold_tickets : 0;
   const soldPct = event ? Math.min((event.sold_tickets / event.total_tickets) * 100, 100) : 0;
-
   const interestedCount = event ? event.sold_tickets : 0;
   const interestedLabel = interestedCount >= 1000
     ? `${(interestedCount / 1000).toFixed(1)}K+ are interested`
@@ -162,139 +158,87 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
 
-      {/* ══════════ HERO BANNER ══════════ */}
-      {/* 1. Desktop & Tablet View (>= 640px) */}
+      {/* HERO BANNER — Desktop & Tablet (>= 640px) */}
       <div className="hidden sm:flex relative w-full overflow-hidden items-center" style={{ background: 'var(--banner-to)', minHeight: 480 }}>
-        
-        {/* Soft Blurred Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image 
-            src={eventImage} 
-            alt="" 
-            fill 
-            sizes="100vw"
-            className="object-cover object-center scale-105" 
-            style={{ filter: 'blur(4px) brightness(0.35)', opacity: 0.55 }} 
-            priority 
+          <Image src={eventImage} alt="" fill sizes="100vw"
+            className="object-cover object-center scale-105"
+            style={{ filter: 'blur(4px) brightness(0.35)', opacity: 0.55 }}
+            priority
           />
         </div>
-
-        {/* Premium linear overlay */}
-        <div 
+        <div
           className="absolute inset-0 z-10"
-          style={{ 
-            background: 'linear-gradient(to right, var(--banner-to) 20%, rgba(15, 23, 42, 0.88) 45%, rgba(15, 23, 42, 0.3) 85%, var(--banner-to) 100%)' 
-          }} 
+          style={{ background: 'linear-gradient(to right, var(--banner-to) 20%, rgba(15, 23, 42, 0.88) 45%, rgba(15, 23, 42, 0.3) 85%, var(--banner-to) 100%)' }}
         />
-
-        {/* Container */}
         <div className="relative z-20 container-max w-full flex flex-row items-center gap-8 md:gap-10 py-10">
-          
-          {/* Portrait Poster Component */}
           <div className="flex-shrink-0">
             <EventPoster src={eventImage} title={event.title} />
           </div>
-
-          {/* Meta & details */}
           <div className="flex flex-col justify-center gap-5 flex-1 min-w-0 text-left text-white">
             <h1 className="text-3xl md:text-[2.5rem] font-bold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
               {event.title}
             </h1>
-
-            {/* Thumbs up rating box */}
             <InterestBox label={interestedLabel} />
-
-            {/* Metadata (Date, City, Type) */}
             <div className="flex flex-wrap items-center gap-2 text-[13px]" style={{ color: 'var(--gray-300)' }}>
               {event.event_type && <span className="font-medium">{event.event_type}</span>}
               {event.event_type && <span style={{ color: 'var(--gray-500)' }}>•</span>}
               <span>{formatDate(event.event_date)}</span>
-              {event.city && (
-                <>
-                  <span style={{ color: 'var(--gray-500)' }}>•</span>
-                  <span>{event.city}</span>
-                </>
-              )}
+              {event.city && (<><span style={{ color: 'var(--gray-500)' }}>•</span><span>{event.city}</span></>)}
             </div>
-
-            {/* Badges */}
             <div className="flex flex-wrap items-center gap-2">
-              <span 
-                className="text-[12px] font-semibold px-2 py-0.5 rounded-sm"
-                style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}
-              >
+              <span className="text-[12px] font-semibold px-2 py-0.5 rounded-sm"
+                style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}>
                 2D
               </span>
               {event.language && (
-                <span 
-                  className="text-[12px] font-semibold px-3 py-0.5 rounded-sm"
-                  style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}
-                >
+                <span className="text-[12px] font-semibold px-3 py-0.5 rounded-sm"
+                  style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}>
                   {event.language}
                 </span>
               )}
             </div>
-
-            {/* Action CTA */}
-            <div className="mt-2">
-              <BookTicketsButton />
-            </div>
+            <div className="mt-2"><BookTicketsButton /></div>
           </div>
-
         </div>
       </div>
 
-      {/* 2. Mobile Clean View (< 640px) — Solid Background, Zero Blur, Spaced & WOW Poster */}
+      {/* HERO BANNER — Mobile (< 640px) */}
       <div className="flex sm:hidden flex-col w-full py-10" style={{ background: 'var(--banner-to)' }}>
         <div className="container-max flex flex-col items-center gap-8">
-          
-          {/* WOW Poster Thumbnail */}
           <EventPoster src={eventImage} title={event.title} mobile />
-
-          {/* Details */}
           <div className="w-full flex flex-col gap-4 text-center text-white px-2">
             <h1 className="text-2xl font-bold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
               {event.title}
             </h1>
-
-            {/* Mobile Thumbs up rating box */}
             <InterestBox label={interestedLabel} mobile />
-
-            {/* Meta Tags */}
             <div className="flex flex-wrap items-center justify-center gap-2 text-[12px]" style={{ color: 'var(--gray-300)' }}>
               {event.event_type && <span>{event.event_type}</span>}
               {event.event_type && <span style={{ color: 'var(--gray-500)' }}>•</span>}
               <span>{formatDate(event.event_date)}</span>
               {event.city && <><span style={{ color: 'var(--gray-500)' }}>•</span><span>{event.city}</span></>}
             </div>
-
-            {/* Badges */}
             <div className="flex items-center justify-center gap-2">
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-sm" style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'transparent' }}>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-sm"
+                style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'transparent' }}>
                 2D
               </span>
               {event.language && (
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-sm" style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'transparent' }}>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-sm"
+                  style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'transparent' }}>
                   {event.language}
                 </span>
               )}
             </div>
-
-            {/* Mobile Booking button */}
             <BookTicketsButton fullWidth />
           </div>
-
         </div>
       </div>
-      {/* ══════════════════════════════════════════════════ */}
 
       {/* DETAILS */}
       <div className="container-max py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-          {/* LEFT CONTENT */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.1 }}
               className="rounded-2xl p-6" style={{ background: 'var(--white)', border: '1px solid var(--gray-200)' }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--black)' }}>About the Event</h2>
@@ -379,7 +323,6 @@ export default function EventDetailPage() {
               </button>
             </div>
           </motion.div>
-
         </div>
       </div>
     </div>

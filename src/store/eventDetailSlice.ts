@@ -1,11 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchEventById } from '../controllers/eventController';
+import { fetchEventBySlug, fetchTrendingEventBySlug } from '../controllers/eventController';
 import { EventData } from './movieSlice';
 
-/**
- * MODEL: Stores the fetched detail of a single event (by slug).
- * Used by the EventDetailPage view.
- */
 
 interface EventDetailState {
   event: EventData | null;
@@ -30,15 +26,29 @@ const eventDetailSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchEventById.pending, (state) => {
+      .addCase(fetchEventBySlug.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchEventById.fulfilled, (state, action: PayloadAction<EventData>) => {
+      .addCase(fetchEventBySlug.fulfilled, (state, action: PayloadAction<EventData>) => {
         state.loading = false;
         state.event = action.payload;
       })
-      .addCase(fetchEventById.rejected, (state, action) => {
+      .addCase(fetchEventBySlug.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Trending detail page — /events/trending/:slug
+      .addCase(fetchTrendingEventBySlug.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTrendingEventBySlug.fulfilled, (state, action: PayloadAction<EventData>) => {
+        state.loading = false;
+        state.event = action.payload;
+      })
+      .addCase(fetchTrendingEventBySlug.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

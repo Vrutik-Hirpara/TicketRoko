@@ -1,45 +1,30 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AppDispatch, RootState } from '../../src/store';
-import { fetchPaginatedEvents, fetchTrendingEvents } from '../../src/controllers/eventController';
+import { fetchPaginatedEvents } from '../../src/controllers/eventController';
 import { MovieCard } from '../../src/components/ui/MovieCard';
 import { SectionHeader } from '../../src/components/ui/SectionHeader';
 
 /**
- * INNER VIEW: Renders the events listing with query-param support.
+ * VIEW: Events Listing Page.
+ * Responsive grid. Clicking a card navigates to /events/:slug.
  */
-function EventsPageContent() {
+export default function EventsPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const searchParams = useSearchParams();
-  
-  const filter = searchParams.get('filter');
-  const isTrending = filter === 'trending';
-
-  const { 
-    allEvents, 
-    allEventsLoading, 
-    pagination, 
-    error,
-    trending,
-    trendingLoading,
-    trendingError
-  } = useSelector((state: RootState) => state.movies);
+  const { allEvents, allEventsLoading, pagination, error } = useSelector(
+    (state: RootState) => state.movies
+  );
 
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
 
   useEffect(() => {
-    if (isTrending) {
-      dispatch(fetchTrendingEvents());
-    } else {
-      dispatch(fetchPaginatedEvents({ page, limit }));
-    }
-  }, [dispatch, page, limit, isTrending]);
+    dispatch(fetchPaginatedEvents({ page, limit }));
+  }, [dispatch, page, limit]);
 
   const handlePrevPage = () => {
     if (page > 1) { 
@@ -62,11 +47,6 @@ function EventsPageContent() {
 
   const getPageNumbers = () => pagination ? Array.from({ length: pagination.totalPages }, (_, i) => i + 1) : [];
 
-  const displayEvents = isTrending ? trending : allEvents;
-  const isLoading = isTrending ? trendingLoading : allEventsLoading;
-  const displayError = isTrending ? trendingError : error;
-  const pageTitle = isTrending ? 'Trending Events' : 'All Events';
-
   const SkeletonCard = () => (
     <div className="flex-shrink-0 w-[246px] bg-white rounded-[18px] p-[4px] shadow-xl animate-pulse">
       <div className="w-[238px] h-[161px] rounded-[16px]" style={{ background: 'var(--gray-200)' }} />
@@ -80,14 +60,6 @@ function EventsPageContent() {
     </div>
   );
 
-  const handleRetry = () => {
-    if (isTrending) {
-      dispatch(fetchTrendingEvents());
-    } else {
-      dispatch(fetchPaginatedEvents({ page, limit }));
-    }
-  };
-
   return (
     <div className="min-h-screen py-10" style={{ background: 'var(--gray-50)' }}>
       <div className="container-max">
@@ -97,8 +69,8 @@ function EventsPageContent() {
           className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 gap-4"
           style={{ borderBottom: '1px solid var(--gray-200)' }}
         >
-          <SectionHeader title={pageTitle} />
-          {!isTrending && pagination && (
+          <SectionHeader title="All Events" />
+          {pagination && (
             <div
               className="flex items-center gap-2 px-4 py-2 rounded-2xl self-start sm:self-auto"
               style={{ background: 'var(--white)', border: '1px solid var(--gray-100)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
@@ -109,39 +81,28 @@ function EventsPageContent() {
               </span>
             </div>
           )}
-          {isTrending && displayEvents.length > 0 && (
-            <div
-              className="flex items-center gap-2 px-4 py-2 rounded-2xl self-start sm:self-auto"
-              style={{ background: 'var(--white)', border: '1px solid var(--gray-100)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-            >
-              <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: 'var(--primary-blue)' }} />
-              <span className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
-                {displayEvents.length} Trending Events
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Loading */}
-        {isLoading || (!isTrending && !pagination && !displayError) ? (
+        {allEventsLoading || (!pagination && !error) ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center">
-            {Array.from({ length: isTrending ? 8 : limit }).map((_, i) => <SkeletonCard key={i} />)}
+            {Array.from({ length: limit }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : displayError ? (
+        ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <p className="text-sm font-semibold px-6 py-4 rounded-2xl"
               style={{ color: '#EF4444', background: '#FEF2F2', border: '1px solid #FECACA' }}>
-              {displayError}
+              {error}
             </p>
             <button
-              onClick={handleRetry}
+              onClick={() => dispatch(fetchPaginatedEvents({ page, limit }))}
               className="text-sm font-semibold px-6 py-3 rounded-full transition"
               style={{ background: 'var(--primary-blue)', color: 'var(--white)' }}
             >
               Try Again
             </button>
           </div>
-        ) : displayEvents.length === 0 ? (
+        ) : allEvents.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-lg font-medium" style={{ color: 'var(--gray-500)' }}>No events found.</p>
           </div>
@@ -154,10 +115,11 @@ function EventsPageContent() {
               transition={{ duration: 0.35 }}
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center"
             >
-              {displayEvents.map((event) => (
+              {allEvents.map((event) => (
                 <MovieCard
                   key={event.id}
                   id={event.id}
+                  slug={event.slug}
                   title={event.title}
                   description={event.description}
                   imageUrl={event.banner_url}
@@ -166,8 +128,8 @@ function EventsPageContent() {
               ))}
             </motion.div>
 
-            {/* Pagination (Only for regular paginated events page) */}
-            {!isTrending && pagination && pagination.totalPages > 1 && (
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-14 flex-wrap">
                 <button
                   onClick={handlePrevPage}
@@ -217,24 +179,5 @@ function EventsPageContent() {
         )}
       </div>
     </div>
-  );
-}
-
-/**
- * EXPORTED PAGE: Events Listing Page.
- * Uses Suspense boundary to support safe Next.js static builds with useSearchParams.
- */
-export default function EventsPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--gray-50)' }}>
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: 'var(--primary-blue)' }} />
-          <p className="text-sm font-medium" style={{ color: 'var(--gray-500)' }}>Loading events...</p>
-        </div>
-      </div>
-    }>
-      <EventsPageContent />
-    </Suspense>
   );
 }

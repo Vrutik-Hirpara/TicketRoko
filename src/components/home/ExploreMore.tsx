@@ -7,7 +7,7 @@ import { SectionHeader } from '../ui/SectionHeader';
 
 export const ExploreMore = () => {
   const categories = ['Concerts', 'Plays', 'Sports', 'Workshops', 'Family Activities'];
-  const localImages = ['/image1.jpg', '/image2.jpg', '/classicmovie.jpg', '/chhava3.jpg', '/chhava4.jpg'];
+
 
   return (
     <section className="container-max py-16 border-t border-gray-50">
@@ -23,7 +23,7 @@ export const ExploreMore = () => {
             className="relative h-[240px] rounded-[24px] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
           >
             <Image
-              src={localImages[i]}
+              src='/event_placeholder.png'
               fill
               sizes="(max-width: 768px) 50vw, 20vw"
               className="object-cover group-hover:scale-110 transition-transform duration-1000"
