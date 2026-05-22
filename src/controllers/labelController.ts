@@ -1,7 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { LabelData } from '../store/labelSlice';
-
-const BASE_URL = 'https://api.ticketroko.retailian.in/api';
+import { BASE_URL } from '../utils/constants';
 
 /**
  * CONTROLLER: Handles all label/promo API calls.

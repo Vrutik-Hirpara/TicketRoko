@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.ticketroko.retailian.in',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   allowedDevOrigins: ['172.24.144.1'] as any,

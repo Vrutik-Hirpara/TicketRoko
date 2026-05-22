@@ -1,88 +1,128 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import { SectionHeader } from '../ui/SectionHeader';
+import { MovieCard } from '../ui/MovieCard';
+import { AppDispatch, RootState } from '../../store';
+import { fetchTrendingEvents } from '../../controllers/eventController';
 
-const trendingItems = [
-  { title: "Arijit Singh Concert", venue: "EKA Arena, Ahmedabad", date: "24", month: "May", image: "/image1.jpg" },
-  { title: "Sunburn Festival", venue: "GMDC Ground, Ahmedabad", date: "15", month: "Dec", image: "/image2.jpg" },
-  { title: "Comedy Express", venue: "The Laugh Store, Mumbai", date: "10", month: "Jun", image: "/image1.jpg" },
-  { title: "IPL 2025 Final", venue: "Narendra Modi Stadium", date: "28", month: "May", image: "/image2.jpg" },
-  { title: "Stand-up Special", venue: "Canvas Laugh Club", date: "05", month: "Jul", image: "/image1.jpg" },
-];
+/**
+ * VIEW: Trending Near You section.
+ * Identical design & functionality to RecommendedMovies —
+ * only data source differs (fetchTrendingEvents → /events/trending).
+ * Drag-to-scroll uses refs (not state) so clicks always reach cards.
+ */
 
 export const TrendingEvents = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { trending, trendingLoading, trendingError } = useSelector(
+    (state: RootState) => state.movies
+  );
+  const router = useRouter();
+
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const isDraggingRef = React.useRef(false);
+  const hasDraggedRef = React.useRef(false);
+  const startXRef = React.useRef(0);
+  const scrollLeftRef = React.useRef(0);
+
+  React.useEffect(() => {
+    dispatch(fetchTrendingEvents());
+  }, [dispatch]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeftRef.current = scrollRef.current.scrollLeft;
+    scrollRef.current.style.cursor = 'grabbing';
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grab';
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 2;
+    if (Math.abs(x - startXRef.current) > 4) hasDraggedRef.current = true;
+    scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
+  };
+
+  const handleCardClick = (id: number) => {
+    if (!hasDraggedRef.current) {
+      router.push(`/events/${id}`);
+    }
+  };
+
   return (
-    <section className="container-max footer-gradient pt-10 overflow-hidden">
-      <SectionHeader 
-        title="Trending Near You" 
-        viewAllLink="/events" 
-      />
+    <section className="container-max py-10 overflow-hidden">
+      <SectionHeader title="Trending Near You" viewAllLink="/events?filter=trending" />
 
-      <motion.div 
-        // variants={{
-        //   hidden: { opacity: 0 },
-        //   visible: {
-        //     opacity: 1,
-        //     transition: {
-        //       staggerChildren: 0.1
-        //     }
-        //   }
-        // }}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.8 }}
-        className="flex gap-8 overflow-x-auto no-scrollbar pt-10 pb-10 px-6"
+      <div
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className="flex gap-8 overflow-x-auto no-scrollbar pt-10 pb-10 px-4 -mx-4 select-none"
+        style={{ cursor: 'grab' }}
       >
-        {trendingItems.map((item, i) => (
-          <motion.div 
-            key={i} 
-            // variants={{
-            //   hidden: { opacity: 0, y: 40, scale: 0.9 },
-            //   visible: { 
-            //     opacity: 1, 
-            //     y: 0, 
-            //     scale: 1,
-            //     transition: { duration: 0.6, ease: "easeOut" }
-            //   }
-            // }}
-            whileHover={{ y: -10 }}
-            className="relative w-[240px] md:w-[300px] h-[170px] md:h-[210px] flex-shrink-0 group cursor-pointer"
+        {trendingLoading ? (
+          // Same loading skeleton as RecommendedMovies
+          Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="flex-shrink-0 w-[246px] bg-white rounded-[18px] p-[4px] shadow-xl animate-pulse"
+            >
+              <div className="w-[238px] h-[161px] rounded-[16px]" style={{ background: 'var(--gray-200)' }} />
+              <div className="flex flex-col gap-3 w-[210px] my-[18px] mx-[14px]">
+                <div className="h-4 rounded-full w-3/4" style={{ background: 'var(--gray-200)' }} />
+                <div className="h-3 rounded-full w-1/2" style={{ background: 'var(--gray-100)' }} />
+                <div className="flex justify-end">
+                  <div className="h-7 rounded-full w-1/3" style={{ background: 'var(--gray-200)' }} />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : trendingError ? (
+          <div
+            className="flex w-full h-[300px] items-center justify-center text-sm"
+            style={{ color: '#EF4444' }}
           >
-            {/* Slanted Card Container */}
-            <div className="w-full h-full rounded-[24px] overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-500 transform -skew-x-12 relative border border-white/50">
-              {/* Inner Image Wrapper */}
-              <div className="absolute inset-0 w-[130%] h-[130%] -left-[15%] -top-[15%] transform skew-x-12 bg-gray-100">
-                <Image
-                  src={item.image}
-                  fill
-                  priority={i < 2}
-                  sizes="300px"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  alt="Trending"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            {trendingError}
+          </div>
+        ) : trending.length > 0 ? (
+          trending.map((event) => (
+            <div
+              key={event.id}
+              className="flex-shrink-0 w-[246px]"
+              onClick={() => handleCardClick(event.id)}
+            >
+              <MovieCard
+                id={event.id}
+                title={event.title}
+                description={event.description}
+                imageUrl={event.banner_url}
+                language={event.language}
+              />
             </div>
-
-            {/* Date Badge - Calendar Style */}
-            <div className="absolute -top-5 -right-5 bg-white rounded-[14px] shadow-[0_15px_30px_rgba(37,99,235,0.15)] overflow-hidden z-30 transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border border-blue-50/50">
-              <div className="bg-[#2563EB] px-3 py-1.5 flex items-center justify-center">
-                <span className="text-[10px] font-black text-white uppercase tracking-[0.1em] leading-none">
-                  {item.month}
-                </span>
-              </div>
-              <div className="px-4 py-2.5 flex items-center justify-center bg-white">
-                <span className="text-[22px] font-black text-[#1e293b] leading-none">
-                  {item.date}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+          ))
+        ) : (
+          <div
+            className="flex w-full h-[300px] items-center justify-center text-sm"
+            style={{ color: 'var(--gray-400)' }}
+          >
+            No trending events available.
+          </div>
+        )}
+      </div>
     </section>
   );
 };

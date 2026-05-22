@@ -4,6 +4,7 @@ import authReducer from './authSlice';
 import appReducer from './appSlice';
 import movieReducer from './movieSlice';
 import labelReducer from './labelSlice';
+import eventDetailReducer from './eventDetailSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     app: appReducer,
     movies: movieReducer,
     labels: labelReducer,
+    eventDetail: eventDetailReducer,
   },
 });
 

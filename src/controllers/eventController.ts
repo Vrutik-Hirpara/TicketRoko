@@ -1,11 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { EventData } from '../store/movieSlice';
-
-const BASE_URL = 'https://api.ticketroko.retailian.in/api';
+import { BASE_URL } from '../utils/constants';
 
 /**
  * CONTROLLER: Handles all event-related API calls.
- * Dispatched from View components, results handled by movieSlice reducers.
+ * Dispatched from View components, results handled by movieSlice / eventDetailSlice reducers.
  */
 
 // Home section — fetch all recommended events (no pagination)
@@ -61,6 +60,38 @@ export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPag
       return rejectWithValue('Unexpected response format');
     } catch (error: any) {
       return rejectWithValue(error.message || 'Network error fetching events');
+    }
+  }
+);
+
+// Event Detail page — fetch single event by numeric ID
+export const fetchEventById = createAsyncThunk<EventData, number>(
+  'eventDetail/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/events/${id}`);
+      if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
+      const result = await response.json();
+      if (result.success && result.data) return result.data as EventData;
+      return rejectWithValue('Unexpected response format');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Network error fetching event detail');
+    }
+  }
+);
+
+// Trending section — fetch trending events from /events/trending
+export const fetchTrendingEvents = createAsyncThunk<EventData[], void>(
+  'movies/fetchTrending',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/events/trending`);
+      if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
+      const result = await response.json();
+      if (result.success && result.data) return result.data as EventData[];
+      return rejectWithValue('Unexpected response format');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Network error fetching trending events');
     }
   }
 );
