@@ -24,6 +24,36 @@
   --footer-bg-from: #eff6ff; /* blue-50 */
   --footer-bg-via: #dbeafe;  /* blue-100 */
   --footer-bg-to: #bfdbfe;   /* blue-200 */
+
+  /* Booking / cinema UI */
+  --booking-bg: #0a0f1a;
+  --booking-surface: #111827;
+  --booking-surface-elevated: #1a2234;
+  --booking-border: rgba(255, 255, 255, 0.08);
+  --booking-text: #f8fafc;
+  --booking-text-muted: #94a3b8;
+  --booking-accent: #22c55e;
+  --booking-accent-hover: #16a34a;
+
+  --seat-available: #6b7280;
+  --seat-available-hover: #9ca3af;
+  --seat-available-fill: #f59e0b;
+  --seat-selected: #22c55e;
+  --seat-selected-hover: #16a34a;
+  --seat-sold: #7f1d1d;
+  --seat-sold-border: #991b1b;
+  --seat-sold-fill: rgba(127, 29, 29, 0.55);
+  --seat-premium: #f97316;
+  --seat-premium-hover: #fb923c;
+  --seat-space-fill: #2a2a35;
+  --screen-glow: rgba(59, 130, 246, 0.35);
+  --tooltip-price: #3b82f6;
+}
+
+.booking-dot-grid {
+  background-color: var(--booking-bg);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .banner-gradient {
@@ -105,6 +135,34 @@ html, body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Hall seat map — scroll on all devices when layout is larger than viewport */
+.hall-scroll-area {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+.hall-scroll-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hall-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hall-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.hall-scroll-inner {
+  min-width: min-content;
+  min-height: min-content;
 }
 
 @layer utilities {

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { EventData } from '../store/movieSlice';
+import type { EventBookingPayload } from '../types/booking';
 import { BASE_URL } from '../utils/constants';
 
 /**
@@ -63,6 +64,45 @@ export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPag
     }
   }
 );
+
+/** Resolve numeric event id from slug (booking-layout uses id, not slug) */
+async function resolveEventId(slugOrId: string): Promise<string> {
+  if (/^\d+$/.test(slugOrId)) return slugOrId;
+
+  const response = await fetch(`${BASE_URL}/events/${slugOrId}`);
+  if (!response.ok) {
+    throw new Error(`Event not found (${response.status})`);
+  }
+
+  const result = await response.json();
+  const id = result?.data?.id;
+  if (!id) throw new Error('Event not found');
+
+  return String(id);
+}
+
+/**
+ * Booking page — GET /events/:id/booking-layout
+ * @see https://api.ticketroko.retailian.in/api/events/2/booking-layout
+ */
+export async function fetchEventBooking(slugOrId: string): Promise<EventBookingPayload> {
+  const eventId = await resolveEventId(slugOrId);
+
+  const response = await fetch(`${BASE_URL}/events/${eventId}/booking-layout`, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load booking layout (${response.status})`);
+  }
+
+  const result = await response.json();
+  if (result.success && result.data) {
+    return result.data as EventBookingPayload;
+  }
+
+  throw new Error('Unexpected booking layout response');
+}
 
 // Event Detail page — fetch single event by slug
 export const fetchEventBySlug = createAsyncThunk<EventData, string>(

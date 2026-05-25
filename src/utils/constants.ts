@@ -23,7 +23,8 @@
 // }
 // Single source of truth for API base URL.
 // Set NEXT_PUBLIC_API_URL in your .env.local file.
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://api.ticketroko.retailian.in/api';
 
 // Derives the uploads domain from the API base URL.
 // e.g. https://api.example.com/api  →  https://api.example.com
@@ -45,5 +46,14 @@ export function getFullImageUrl(url?: string | null): string {
   }
 
   // Block external images and show default image
+  return fallback;
+}
+
+/** Banner for booking/detail — allows absolute URLs from API (e.g. Unsplash) */
+export function getEventBannerUrl(url?: string | null): string {
+  const fallback = "/event_placeholder.png";
+  if (!url) return fallback;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/uploads")) return `${UPLOADS_URL}${url}`;
   return fallback;
 }

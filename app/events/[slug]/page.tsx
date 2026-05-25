@@ -14,9 +14,17 @@ import { clearEventDetail } from '../../../src/store/eventDetailSlice';
 // ══════════ REUSABLE ATOMS & COMPONENTS ══════════
 
 // 1. Reusable Animated Booking CTA Button
-function BookTicketsButton({ fullWidth = false }: { fullWidth?: boolean }) {
+function BookTicketsButton({
+  fullWidth = false,
+  onClick,
+}: {
+  fullWidth?: boolean;
+  onClick?: () => void;
+}) {
   return (
     <motion.button
+      type="button"
+      onClick={onClick}
       whileHover={{ scale: 1.04, background: 'var(--primary-blue-hover)' }}
       whileTap={{ scale: 0.97 }}
       className={`text-[15px] font-bold px-12 py-3.5 rounded-md shadow-lg transition duration-200 ${
@@ -135,6 +143,8 @@ export default function EventDetailPage() {
     ? `${(interestedCount / 1000).toFixed(1)}K+ are interested`
     : `${interestedCount} are interested`;
 
+  const goToBooking = () => router.push(`/events/${eventSlug}/book`);
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--banner-to)' }}>
       <div className="animate-pulse flex flex-col items-center gap-4">
@@ -237,7 +247,7 @@ export default function EventDetailPage() {
 
             {/* Action CTA */}
             <div className="mt-2">
-              <BookTicketsButton />
+              <BookTicketsButton onClick={goToBooking} />
             </div>
           </div>
 
@@ -281,7 +291,7 @@ export default function EventDetailPage() {
             </div>
 
             {/* Mobile Booking button */}
-            <BookTicketsButton fullWidth />
+            <BookTicketsButton fullWidth onClick={goToBooking} />
           </div>
 
         </div>
@@ -366,7 +376,7 @@ export default function EventDetailPage() {
                 {event.language && <Pill label={event.language} />}
               </div>
 
-              <BookTicketsButton fullWidth />
+              <BookTicketsButton fullWidth onClick={goToBooking} />
 
               <p className="text-center text-[11px]" style={{ color: 'var(--gray-400)' }}>
                 Secure checkout • Instant confirmation
