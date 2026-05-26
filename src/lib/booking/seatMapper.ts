@@ -113,6 +113,7 @@ export function bookingPayloadToEvent(
   const ticketPrice = parseFloat(event.ticket_price) || 1000;
 
   return {
+    eventId: event.id,
     slug: event.slug,
     title: event.title,
     description: event.description || '',
@@ -137,6 +138,7 @@ export function eventDataToBookingFromApi(event: EventData, bannerUrl: string): 
   const ticketPrice = parseFloat(event.ticket_price) || 1000;
 
   return {
+    eventId: event.id,
     slug: event.slug,
     title: event.title,
     description: event.description || '',

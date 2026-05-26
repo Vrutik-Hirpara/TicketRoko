@@ -24,6 +24,7 @@ export function eventDataToBookingEvent(event: EventData, bannerFallback: string
   const start = formatDisplayTime(event.start_time);
 
   return {
+    eventId: event.id,
     slug: event.slug,
     title: event.title,
     description: event.description || AMAZONE_BOOKING_EVENT.description,

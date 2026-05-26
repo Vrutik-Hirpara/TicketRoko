@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { setLocation, setSearchQuery } from '../store/appSlice';
 import { toggleSidebar } from '../store/uiSlice';
+import { logout } from '../store/authSlice';
 
 export const useNavbar = () => {
   const dispatch = useDispatch();
   const { location, searchQuery } = useSelector((state: RootState) => state.app);
+  const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,6 +31,10 @@ export const useNavbar = () => {
     dispatch(toggleSidebar());
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return {
     location,
     searchQuery,
@@ -36,5 +42,10 @@ export const useNavbar = () => {
     handleLocationChange,
     handleSearch,
     handleToggleMenu,
+    isAuthenticated,
+    user,
+    hydrated,
+    handleLogout,
   };
 };
+

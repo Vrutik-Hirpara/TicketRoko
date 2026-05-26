@@ -1,31 +1,51 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { AuthUser } from '../types/auth';
+import { clearStoredAuth, setStoredAuth } from '../lib/auth/storage';
 
 interface AuthState {
-  user: any | null;
+  user: AuthUser | null;
+  token: string | null;
   isAuthenticated: boolean;
-  loading: boolean;
+  hydrated: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
+  token: null,
   isAuthenticated: false,
-  loading: false,
+  hydrated: false,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<any>) => {
-      state.user = action.payload;
-      state.isAuthenticated = !!action.payload;
+    setCredentials: (
+      state,
+      action: PayloadAction<{ user: AuthUser; token: string }>,
+    ) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      setStoredAuth(action.payload.token, action.payload.user);
     },
     logout: (state) => {
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
+      clearStoredAuth();
+    },
+    setHydrated: (
+      state,
+      action: PayloadAction<{ user: AuthUser | null; token: string | null }>,
+    ) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = !!action.payload.token;
+      state.hydrated = true;
     },
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setCredentials, logout, setHydrated } = authSlice.actions;
 export default authSlice.reducer;

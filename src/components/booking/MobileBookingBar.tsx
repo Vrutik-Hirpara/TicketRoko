@@ -7,6 +7,7 @@ interface MobileBookingBarProps {
   quantity: number;
   totalFormatted: string;
   onProceed: () => void;
+  submitting?: boolean;
 }
 
 export function MobileBookingBar({
@@ -14,6 +15,7 @@ export function MobileBookingBar({
   quantity,
   totalFormatted,
   onProceed,
+  submitting = false,
 }: MobileBookingBarProps) {
   const hasSelection = quantity > 0;
 
@@ -49,7 +51,7 @@ export function MobileBookingBar({
 
         <button
           type="button"
-          disabled={!hasSelection}
+          disabled={!hasSelection || submitting}
           onClick={onProceed}
           className="flex-shrink-0 px-5 py-2.5 rounded-xl font-bold text-sm disabled:opacity-40 hover:opacity-90"
           style={{
@@ -57,7 +59,7 @@ export function MobileBookingBar({
             color: 'var(--white)',
           }}
         >
-          Proceed
+          {submitting ? '…' : 'Proceed'}
         </button>
       </div>
     </div>

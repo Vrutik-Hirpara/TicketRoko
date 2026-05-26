@@ -68,6 +68,7 @@ export interface SeatData {
 }
 
 export interface BookingEvent {
+  eventId: number;
   slug: string;
   title: string;
   description: string;

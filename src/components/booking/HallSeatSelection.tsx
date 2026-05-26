@@ -1,6 +1,7 @@
 'use client';
 
 import type { SeatData, SectionSummary } from '../../types/booking';
+import type { CheckoutSelection } from '../../hooks/useBookingCheckout';
 import { useSeatSelection } from '../../hooks/useSeatSelection';
 import { SeatMap } from './SeatMap';
 import { BookingSummary } from './BookingSummary';
@@ -11,7 +12,8 @@ interface HallSeatSelectionProps {
   sectionSummary?: SectionSummary[];
   hallName?: string;
   showTiming: string | null;
-  onProceed: () => void;
+  onProceed: (selection: CheckoutSelection) => void;
+  submitting?: boolean;
 }
 
 export function HallSeatSelection({
@@ -20,14 +22,24 @@ export function HallSeatSelection({
   hallName,
   showTiming,
   onProceed,
+  submitting = false,
 }: HallSeatSelectionProps) {
   const {
     selectedSeats,
     quantity,
     totalFormatted,
+    totalAmount,
     toggleSeat,
     selectedIds,
   } = useSeatSelection(seats);
+
+  const handleProceed = () => {
+    onProceed({
+      selectedSeats,
+      quantity,
+      totalAmount,
+    });
+  };
 
   return (
     <section id="seat-selection" className="container-max pb-28 lg:pb-16 pt-4 sm:pt-6 overflow-x-hidden">
@@ -65,7 +77,8 @@ export function HallSeatSelection({
             quantity={quantity}
             totalFormatted={totalFormatted}
             showTiming={showTiming}
-            onProceed={onProceed}
+            onProceed={handleProceed}
+            submitting={submitting}
           />
         </div>
       </div>
@@ -76,7 +89,8 @@ export function HallSeatSelection({
           quantity={quantity}
           totalFormatted={totalFormatted}
           showTiming={showTiming}
-          onProceed={onProceed}
+          onProceed={handleProceed}
+          submitting={submitting}
         />
       </div>
 
@@ -84,7 +98,8 @@ export function HallSeatSelection({
         selectedSeats={selectedSeats}
         quantity={quantity}
         totalFormatted={totalFormatted}
-        onProceed={onProceed}
+        onProceed={handleProceed}
+        submitting={submitting}
       />
     </section>
   );

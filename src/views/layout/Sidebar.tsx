@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import Link from 'next/link';
 import { RootState } from '../../store';
 import { toggleSidebar } from '../../store/uiSlice';
+import { logout } from '../../store/authSlice';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, MapPin, ChevronRight } from 'lucide-react';
+import { X, Search, MapPin, ChevronRight, LogOut } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -13,6 +15,7 @@ import { Input } from '../ui/Input';
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state: RootState) => state.ui.isSidebarOpen);
+  const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
 
   return (
     <AnimatePresence>
@@ -66,9 +69,40 @@ export const Sidebar = () => {
 
               {/* Auth */}
               <div className="mt-auto">
-                <Button className="w-full">
-                  Login <ChevronRight className="w-5 h-5 ml-2" />
-                </Button>
+                {hydrated && isAuthenticated ? (
+                  <div className="flex flex-col gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-base shadow-sm select-none">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-sm font-semibold text-gray-800 leading-tight">
+                          {user?.name}
+                        </span>
+                        <span className="text-xs text-gray-400 leading-tight">
+                          {user?.role || 'User'}
+                        </span>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        dispatch(logout());
+                        dispatch(toggleSidebar());
+                      }} 
+                      variant="outline" 
+                      className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center justify-center gap-2 mt-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Link href="/login" onClick={() => dispatch(toggleSidebar())}>
+                    <Button className="w-full bg-[#2563EB] hover:bg-[#1d4ed8]">
+                      Login <ChevronRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
@@ -77,3 +111,4 @@ export const Sidebar = () => {
     </AnimatePresence>
   );
 };
+

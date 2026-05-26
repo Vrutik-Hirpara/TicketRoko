@@ -1,6 +1,7 @@
 import type { BookingEvent } from '../types/booking';
 
 export const AMAZONE_BOOKING_EVENT: BookingEvent = {
+  eventId: 2,
   slug: 'amazone-event',
   title: 'Amazone Event',
   description:

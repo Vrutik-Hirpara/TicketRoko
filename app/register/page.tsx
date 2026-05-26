@@ -1,0 +1,219 @@
+'use client';
+
+import { FormEvent, useState, Suspense } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AuthPageLayout } from '../../src/components/auth/AuthPageLayout';
+import { registerUser } from '../../src/controllers/authController';
+import { setCredentials } from '../../src/store/authSlice';
+import { useCompletePendingBooking } from '../../src/hooks/useCompletePendingBooking';
+import type { AppDispatch } from '../../src/store';
+
+function RegisterForm() {
+  const searchParams = useSearchParams();
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const { completeIfPending, completing } = useCompletePendingBooking();
+
+  const returnUrl = searchParams.get('returnUrl') || '/';
+  const checkout = searchParams.get('checkout') === '1';
+
+  // Build clean URL without redundant query parameters
+  const loginHref = (returnUrl === '/' && !checkout)
+    ? '/login'
+    : `/login?returnUrl=${encodeURIComponent(returnUrl)}${checkout ? '&checkout=1' : ''}`;
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await registerUser({ name, email, password });
+      if (res.token) {
+        dispatch(setCredentials({ token: res.token, user: res.user }));
+      }
+      
+      // Clear fields
+      setName('');
+      setEmail('');
+      setPassword('');
+      
+      setSuccess('Registration successful! Redirecting to login...');
+      
+      setTimeout(() => {
+        router.push(loginHref);
+      }, 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const busy = loading || completing || !!success;
+
+  return (
+    <AuthPageLayout
+      title="Create your account"
+      subtitle={
+        checkout
+          ? 'Register to complete your seat booking'
+          : 'Join TicketRoko to book events'
+      }
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link
+            href={loginHref}
+            className="font-semibold hover:underline"
+            style={{ color: 'var(--primary-blue)' }}
+          >
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="text-sm px-4 py-3 rounded-xl border border-red-200 text-red-700 bg-red-50 font-medium flex items-center gap-2"
+            >
+              <div className="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold shrink-0 select-none">
+                ✕
+              </div>
+              <span>{error}</span>
+            </motion.div>
+          )}
+
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="text-sm px-4 py-3 rounded-xl border border-green-200 text-green-700 bg-green-50 font-medium flex items-center gap-2"
+            >
+              <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold shrink-0 select-none">
+                ✓
+              </div>
+              <span>{success}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div>
+          <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--booking-text-muted)' }}>
+            Full name
+          </label>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
+              style={{
+                background: 'var(--booking-surface-elevated)',
+                color: 'var(--booking-text)',
+                border: '1px solid var(--booking-border)',
+              }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--booking-text-muted)' }}>
+            Email
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
+            <input
+              type="email"
+              name="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
+              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
+              style={{
+                background: 'var(--booking-surface-elevated)',
+                color: 'var(--booking-text)',
+                border: '1px solid var(--booking-border)',
+              }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--booking-text-muted)' }}>
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
+            <input
+              type="password"
+              name="password"
+              autoComplete="new-password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
+              style={{
+                background: 'var(--booking-surface-elevated)',
+                color: 'var(--booking-text)',
+                border: '1px solid var(--booking-border)',
+              }}
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full py-3.5 rounded-xl font-bold text-[15px] flex items-center justify-center gap-2 disabled:opacity-60"
+          style={{ background: 'var(--primary-blue)', color: 'var(--white)' }}
+        >
+          {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+          {completing ? 'Completing booking…' : busy ? 'Creating account…' : 'Register'}
+        </button>
+      </form>
+    </AuthPageLayout>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: 'var(--booking-bg)' }}
+        >
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--primary-blue)' }} />
+        </div>
+      }
+    >
+      <RegisterForm />
+    </Suspense>
+  );
+}

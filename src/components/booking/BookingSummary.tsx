@@ -9,6 +9,7 @@ interface BookingSummaryProps {
   totalFormatted: string;
   showTiming: string | null;
   onProceed: () => void;
+  submitting?: boolean;
 }
 
 export function BookingSummary({
@@ -17,6 +18,7 @@ export function BookingSummary({
   totalFormatted,
   showTiming,
   onProceed,
+  submitting = false,
 }: BookingSummaryProps) {
   const hasSelection = quantity > 0;
 
@@ -64,7 +66,7 @@ export function BookingSummary({
 
       <button
         type="button"
-        disabled={!hasSelection}
+        disabled={!hasSelection || submitting}
         onClick={onProceed}
         className="w-full py-3.5 rounded-xl font-bold text-[15px] transition-opacity disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
         style={{
@@ -72,7 +74,7 @@ export function BookingSummary({
           color: 'var(--white)',
         }}
       >
-        Proceed
+        {submitting ? 'Processing…' : 'Proceed'}
       </button>
     </div>
   );

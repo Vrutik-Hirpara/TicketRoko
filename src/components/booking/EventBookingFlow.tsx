@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import type { BookingEvent, SeatData, SectionSummary } from '../../types/booking';
+import { useBookingCheckout } from '../../hooks/useBookingCheckout';
 import { EventBookingDetails } from './EventBookingDetails';
 import { BookTicketsButton } from './BookTicketsButton';
 
@@ -34,6 +35,11 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
   const [selectedTiming, setSelectedTiming] = useState<string | null>(null);
   const [showSeatSection, setShowSeatSection] = useState(false);
 
+  const { proceedToCheckout, submitting, error: checkoutError } = useBookingCheckout(
+    event,
+    selectedTiming,
+  );
+
   const scrollToSeats = useCallback(() => {
     requestAnimationFrame(() => {
       document.getElementById('seat-selection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -58,10 +64,6 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
     scrollToSeats();
   }, [selectedTiming, event.showTimings, handleSelectTiming, scrollToSeats]);
 
-  const handleProceed = useCallback(() => {
-    alert(`Proceed to payment for show: ${selectedTiming}`);
-  }, [selectedTiming]);
-
   return (
     <div className="min-h-screen min-w-0 overflow-x-hidden" style={{ background: 'var(--booking-bg)' }}>
       <div className="container-max pt-4">
@@ -75,6 +77,17 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
           Back
         </button>
       </div>
+
+      {checkoutError && (
+        <div className="container-max mb-4">
+          <p
+            className="text-sm px-4 py-3 rounded-xl"
+            style={{ color: 'var(--seat-sold-border)', background: 'var(--seat-sold-fill)' }}
+          >
+            {checkoutError}
+          </p>
+        </div>
+      )}
 
       <EventBookingDetails
         event={event}
@@ -90,7 +103,8 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
           sectionSummary={sectionSummary}
           hallName={event.hallName}
           showTiming={selectedTiming}
-          onProceed={handleProceed}
+          onProceed={proceedToCheckout}
+          submitting={submitting}
         />
       )}
 
