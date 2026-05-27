@@ -88,21 +88,21 @@ function InterestBox({ label, mobile = false }: { label: string; mobile?: boolea
   return (
     <div 
       className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
-        mobile ? 'w-full px-4 py-3' : 'gap-4 px-4 py-3 self-start'
+        mobile ? 'w-full px-4 py-3' : 'gap-4 px-5 py-3.5 self-start'
       }`}
       style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
     >
       <div className="flex items-center gap-2 text-left">
-        <span className="text-xl">👍</span>
+        <span className="text-2xl">👍</span>
         <div>
-          <p className="text-[12px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
-          <p className="text-[10px]" style={{ color: 'var(--gray-300)' }}>
+          <p className="text-[14px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
+          <p className="text-[11px]" style={{ color: 'var(--gray-300)' }}>
             {mobile ? 'Reviews trigger rating status.' : 'Rating will appear once reviews come in.'}
           </p>
         </div>
       </div>
       <button 
-        className="text-[11px] font-semibold px-2.5 py-1 rounded transition hover:bg-white/10"
+        className="text-[13px] font-semibold px-3 py-1.5 rounded transition hover:bg-white/10"
         style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
       >
         Rate now
@@ -168,6 +168,9 @@ export default function EventDetailPage() {
   );
 
   const eventImage = getFullImageUrl(event.banner_url);
+  const bgImage = (event as any).background_image_url
+    ? getFullImageUrl((event as any).background_image_url)
+    : '/event_placeholder.png';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
@@ -179,12 +182,12 @@ export default function EventDetailPage() {
         {/* Soft Blurred Background Image */}
         <div className="absolute inset-0 z-0">
           <Image 
-            src={eventImage} 
+            src={bgImage} 
             alt="" 
             fill 
             sizes="100vw"
             className="object-cover object-center scale-105" 
-            style={{ filter: 'blur(4px) brightness(0.35)', opacity: 0.55 }} 
+            style={{ filter: ' brightness(0.35)', opacity: 0.55 }} 
             priority 
           />
         </div>
@@ -207,22 +210,34 @@ export default function EventDetailPage() {
 
           {/* Meta & details */}
           <div className="flex flex-col justify-center gap-5 flex-1 min-w-0 text-left text-white">
-            <h1 className="text-3xl md:text-[2.5rem] font-bold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
+            <h1 className="text-3xl md:text-[2.65rem] font-extrabold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
               {event.title}
             </h1>
 
             {/* Thumbs up rating box */}
             <InterestBox label={interestedLabel} />
 
-            {/* Metadata (Date, City, Type) */}
-            <div className="flex flex-wrap items-center gap-2 text-[13px]" style={{ color: 'var(--gray-300)' }}>
-              {event.event_type && <span className="font-medium">{event.event_type}</span>}
-              {event.event_type && <span style={{ color: 'var(--gray-500)' }}>•</span>}
-              <span>{formatDate(event.event_date)}</span>
+            {/* Metadata (Type, Age Restriction, Date, City) */}
+            <div className="flex flex-wrap items-center gap-2.5 text-[15px]" style={{ color: 'var(--gray-200)' }}>
+              {event.event_type && (
+                <>
+                  <span className="font-semibold text-white">{event.event_type}</span>
+                  <span style={{ color: 'var(--gray-500)' }}>•</span>
+                </>
+              )}
+              {(event as any).age_restriction && (
+                <>
+                  <span className="px-2.5 py-0.5 border border-white/30 rounded-md font-bold text-[12px]" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+                    {(event as any).age_restriction}
+                  </span>
+                  <span style={{ color: 'var(--gray-500)' }}>•</span>
+                </>
+              )}
+              <span className="font-medium text-white">{formatDate(event.event_date)}</span>
               {event.city && (
                 <>
                   <span style={{ color: 'var(--gray-500)' }}>•</span>
-                  <span>{event.city}</span>
+                  <span className="font-medium text-white">{event.city}</span>
                 </>
               )}
             </div>
@@ -230,15 +245,15 @@ export default function EventDetailPage() {
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2">
               <span 
-                className="text-[12px] font-semibold px-2 py-0.5 rounded-sm"
-                style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}
+                className="text-[13px] font-bold px-2.5 py-0.5 rounded-sm"
+                style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.3)', background: 'transparent' }}
               >
                 2D
               </span>
               {event.language && (
                 <span 
-                  className="text-[12px] font-semibold px-3 py-0.5 rounded-sm"
-                  style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.25)', background: 'transparent' }}
+                  className="text-[13px] font-bold px-3 py-0.5 rounded-sm"
+                  style={{ color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.3)', background: 'transparent' }}
                 >
                   {event.language}
                 </span>
@@ -270,10 +285,22 @@ export default function EventDetailPage() {
             {/* Mobile Thumbs up rating box */}
             <InterestBox label={interestedLabel} mobile />
 
-            {/* Meta Tags */}
+            {/* Mobile Meta Tags */}
             <div className="flex flex-wrap items-center justify-center gap-2 text-[12px]" style={{ color: 'var(--gray-300)' }}>
-              {event.event_type && <span>{event.event_type}</span>}
-              {event.event_type && <span style={{ color: 'var(--gray-500)' }}>•</span>}
+              {event.event_type && (
+                <>
+                  <span>{event.event_type}</span>
+                  <span style={{ color: 'var(--gray-500)' }}>•</span>
+                </>
+              )}
+              {(event as any).age_restriction && (
+                <>
+                  <span className="px-2 py-0.5 border border-white/20 rounded-md font-semibold text-[10px]" style={{ background: 'rgba(255, 255, 255, 0.08)' }}>
+                    {(event as any).age_restriction}
+                  </span>
+                  <span style={{ color: 'var(--gray-500)' }}>•</span>
+                </>
+              )}
               <span>{formatDate(event.event_date)}</span>
               {event.city && <><span style={{ color: 'var(--gray-500)' }}>•</span><span>{event.city}</span></>}
             </div>
@@ -308,9 +335,9 @@ export default function EventDetailPage() {
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.1 }}
               className="rounded-2xl p-6" style={{ background: 'var(--white)', border: '1px solid var(--gray-200)' }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--black)' }}>About the Event</h2>
-              <p className="text-[14px] leading-relaxed" style={{ color: 'var(--gray-500)' }}>
-                {event.description || 'No description provided.'}
-              </p>
+              <div className="text-[14px] text-gray-600 leading-relaxed whitespace-pre-line">
+                {event.description || 'No description available for this event.'}
+              </div>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.16 }}

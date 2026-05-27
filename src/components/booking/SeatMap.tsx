@@ -24,6 +24,10 @@ interface SeatMapProps {
   onToggleSeat: (seat: SeatData) => void;
 }
 
+const ZOOM_STEP = 0.1;
+const ZOOM_MIN = 0.25;
+const ZOOM_MAX = 2.0;
+
 export function SeatMap({
   seats,
   sectionSummary = [],
@@ -32,13 +36,22 @@ export function SeatMap({
   onToggleSeat,
 }: SeatMapProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [zoomDelta, setZoomDelta] = useState(0);
 
   const bookableSeats = useMemo(() => getBookableSeats(seats), [seats]);
   const bounds = useMemo(() => computeCanvasBounds(seats), [seats]);
-  const { viewportRef, scale, scaledWidth, scaledHeight } = useHallViewportScale(
+  const { viewportRef, scale: autoScale } = useHallViewportScale(
     bounds.width,
     bounds.height,
   );
+
+  // Final scale = auto-fit + user adjustment, clamped to safe range
+  const scale = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, autoScale + zoomDelta));
+  const finalWidth = Math.ceil(bounds.width * scale);
+  const finalHeight = Math.ceil(bounds.height * scale);
+
+  const canZoomIn = scale + ZOOM_STEP <= ZOOM_MAX + 0.001;
+  const canZoomOut = scale - ZOOM_STEP >= ZOOM_MIN - 0.001;
 
   const sectionLabels = useMemo(
     () => getSectionLabelPositions(seats, sectionSummary),
@@ -84,7 +97,54 @@ export function SeatMap({
         </p>
       )}
 
-      {/* Scrollable viewport — hall never clipped */}
+      {/* ── Zoom Controls ── */}
+      <div className="flex items-center gap-2 mb-3 self-end">
+        <span className="text-[11px] font-semibold" style={{ color: 'var(--booking-text-muted)' }}>
+          {Math.round(scale * 100)}%
+        </span>
+        <button
+          onClick={() => setZoomDelta((d) => Math.min(ZOOM_MAX - autoScale, d + ZOOM_STEP))}
+          disabled={!canZoomIn}
+          title="Zoom in"
+          className="w-7 h-7 flex items-center justify-center rounded-md text-lg font-bold transition-opacity disabled:opacity-30 select-none"
+          style={{
+            background: 'var(--booking-surface-elevated)',
+            border: '1px solid var(--booking-border)',
+            color: 'var(--booking-text)',
+          }}
+        >
+          +
+        </button>
+        <button
+          onClick={() => setZoomDelta((d) => Math.max(ZOOM_MIN - autoScale, d - ZOOM_STEP))}
+          disabled={!canZoomOut}
+          title="Zoom out"
+          className="w-7 h-7 flex items-center justify-center rounded-md text-lg font-bold transition-opacity disabled:opacity-30 select-none"
+          style={{
+            background: 'var(--booking-surface-elevated)',
+            border: '1px solid var(--booking-border)',
+            color: 'var(--booking-text)',
+          }}
+        >
+          −
+        </button>
+        {zoomDelta !== 0 && (
+          <button
+            onClick={() => setZoomDelta(0)}
+            title="Reset zoom"
+            className="text-[11px] font-semibold px-2 py-0.5 rounded transition"
+            style={{
+              background: 'var(--booking-surface-elevated)',
+              border: '1px solid var(--booking-border)',
+              color: 'var(--booking-text-muted)',
+            }}
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
+      {/* Scrollable viewport */}
       <div
         ref={viewportRef}
         className="hall-scroll-area w-full max-w-full rounded-2xl"
@@ -98,10 +158,7 @@ export function SeatMap({
         <div className="hall-scroll-inner flex min-h-full min-w-full items-start justify-center p-2 sm:p-3">
           <div
             className="relative shrink-0"
-            style={{
-              width: scaledWidth,
-              height: scaledHeight,
-            }}
+            style={{ width: finalWidth, height: finalHeight }}
           >
             <div
               className="absolute top-0 left-0 booking-dot-grid rounded-xl"

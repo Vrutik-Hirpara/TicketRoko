@@ -77,7 +77,7 @@ html, body {
     background-color: white;
     color: black;
     -webkit-font-smoothing: antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
 
@@ -88,7 +88,7 @@ html, body {
          sm:px-6 
          md:px-6 
          lg:px-8 
-         xl:px-[90px];
+         xl:px-[50px];
 
   max-width: var(--container-width);
 }

@@ -3,6 +3,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { MovieCard } from '../ui/MovieCard';
 import { AppDispatch, RootState } from '../../store';
@@ -28,9 +29,30 @@ export const TrendingEvents = () => {
   const startXRef = React.useRef(0);
   const scrollLeftRef = React.useRef(0);
 
+  const [showLeftArrow, setShowLeftArrow] = React.useState(false);
+  const [showRightArrow, setShowRightArrow] = React.useState(false);
+
   React.useEffect(() => {
     dispatch(fetchTrendingEvents());
   }, [dispatch]);
+
+  const updateArrowVisibility = React.useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const canScrollLeft = el.scrollLeft > 5;
+    const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+    setShowLeftArrow(canScrollLeft);
+    setShowRightArrow(canScrollRight);
+  }, []);
+
+  React.useEffect(() => {
+    const timer = setTimeout(updateArrowVisibility, 500);
+    window.addEventListener('resize', updateArrowVisibility);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateArrowVisibility);
+    };
+  }, [trending, updateArrowVisibility]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -38,7 +60,7 @@ export const TrendingEvents = () => {
     hasDraggedRef.current = false;
     startXRef.current = e.pageX - scrollRef.current.offsetLeft;
     scrollLeftRef.current = scrollRef.current.scrollLeft;
-    scrollRef.current.style.cursor = 'grabbing';
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grabbing';
   };
 
   const handleMouseUp = () => {
@@ -53,6 +75,19 @@ export const TrendingEvents = () => {
     const walk = (x - startXRef.current) * 2;
     if (Math.abs(x - startXRef.current) > 4) hasDraggedRef.current = true;
     scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
+    updateArrowVisibility();
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Mathematically perfect step: 5 cards (207px width + 32px gap) = 1195px
+    const scrollAmount = 1195;
+    el.scrollTo({
+      left: el.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount),
+      behavior: 'smooth'
+    });
+    setTimeout(updateArrowVisibility, 350);
   };
 
   const handleCardClick = (slug: string) => {
@@ -62,67 +97,87 @@ export const TrendingEvents = () => {
   };
 
   return (
-    <section className="container-max py-10 overflow-hidden">
+    <section className="container-max py-10 overflow-hidden relative">
       <SectionHeader title="Trending Near You" viewAllLink="/events/trending" />
 
-      <div
-        ref={scrollRef}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        className="flex gap-8 overflow-x-auto no-scrollbar pt-10 pb-10 px-4 -mx-4 select-none"
-        style={{ cursor: 'grab' }}
-      >
-        {trendingLoading ? (
-          // Same loading skeleton as RecommendedMovies
-          Array.from({ length: 6 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="flex-shrink-0 w-[246px] bg-white rounded-[18px] p-[4px] shadow-xl animate-pulse"
-            >
-              <div className="w-[238px] h-[161px] rounded-[16px]" style={{ background: 'var(--gray-200)' }} />
-              <div className="flex flex-col gap-3 w-[210px] my-[18px] mx-[14px]">
-                <div className="h-4 rounded-full w-3/4" style={{ background: 'var(--gray-200)' }} />
-                <div className="h-3 rounded-full w-1/2" style={{ background: 'var(--gray-100)' }} />
-                <div className="flex justify-end">
-                  <div className="h-7 rounded-full w-1/3" style={{ background: 'var(--gray-200)' }} />
+      <div className="relative w-full">
+        {/* Left Arrow Button */}
+        {showLeftArrow && (
+          <button
+            onClick={() => scroll('left')}
+            className="absolute -left-4 top-[176px] -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-300 z-40 shadow-2xl border border-white/10 cursor-pointer"
+          >
+            <ChevronLeft className="w-7 h-7" />
+          </button>
+        )}
+
+        {/* Right Arrow Button */}
+        {showRightArrow && (
+          <button
+            onClick={() => scroll('right')}
+            className="absolute -right-4 top-[176px] -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-300 z-40 shadow-2xl border border-white/10 cursor-pointer"
+          >
+            <ChevronRight className="w-7 h-7" />
+          </button>
+        )}
+
+        <div
+          ref={scrollRef}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          onScroll={updateArrowVisibility}
+          className="flex gap-8 overflow-x-auto no-scrollbar pt-4 pb-8 select-none scroll-smooth snap-x snap-mandatory"
+          style={{ cursor: 'grab' }}
+        >
+          {trendingLoading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="flex-shrink-0 w-[207px] animate-pulse snap-start"
+              >
+                <div className="w-[207px] h-[352px] rounded-[10px] bg-gray-200" />
+                <div className="flex flex-col gap-2 mt-3">
+                  <div className="h-4 rounded bg-gray-200 w-3/4" />
+                  <div className="h-3 rounded bg-gray-100 w-1/2" />
                 </div>
               </div>
-            </div>
-          ))
-        ) : trendingError ? (
-          <div
-            className="flex w-full h-[300px] items-center justify-center text-sm"
-            style={{ color: '#EF4444' }}
-          >
-            {trendingError}
-          </div>
-        ) : trending.length > 0 ? (
-          trending.map((event) => (
+            ))
+          ) : trendingError ? (
             <div
-              key={event.id}
-              className="flex-shrink-0 w-[246px]"
+              className="flex w-full h-[300px] items-center justify-center text-sm"
+              style={{ color: '#EF4444' }}
             >
-              <MovieCard
-                id={event.id}
-                slug={event.slug}
-                title={event.title}
-                description={event.description}
-                imageUrl={event.banner_url}
-                language={event.language}
-                onClick={() => handleCardClick(event.slug)}
-              />
+              {trendingError}
             </div>
-          ))
-        ) : (
-          <div
-            className="flex w-full h-[300px] items-center justify-center text-sm"
-            style={{ color: 'var(--gray-400)' }}
-          >
-            No trending events available.
-          </div>
-        )}
+          ) : trending.length > 0 ? (
+            trending.map((event) => (
+              <div
+                key={event.id}
+                className="flex-shrink-0 w-[207px] snap-start"
+              >
+                <MovieCard
+                  id={event.id}
+                  slug={event.slug}
+                  title={event.title}
+                  description={event.description}
+                  imageUrl={event.banner_url}
+                  language={event.language}
+                  eventType={event.event_type}
+                  onClick={() => handleCardClick(event.slug)}
+                />
+              </div>
+            ))
+          ) : (
+            <div
+              className="flex w-full h-[300px] items-center justify-center text-sm"
+              style={{ color: 'var(--gray-400)' }}
+            >
+              No trending events available.
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

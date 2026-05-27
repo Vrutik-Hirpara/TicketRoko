@@ -24,14 +24,11 @@ export default function TrendingEventsPage() {
   }, [dispatch]);
 
   const SkeletonCard = () => (
-    <div className="flex-shrink-0 w-[246px] bg-white rounded-[18px] p-[4px] shadow-xl animate-pulse">
-      <div className="w-[238px] h-[161px] rounded-[16px]" style={{ background: 'var(--gray-200)' }} />
-      <div className="flex flex-col gap-3 w-[210px] my-[18px] mx-[14px]">
-        <div className="h-4 rounded-full w-3/4" style={{ background: 'var(--gray-200)' }} />
-        <div className="h-3 rounded-full w-1/2" style={{ background: 'var(--gray-100)' }} />
-        <div className="flex justify-end">
-          <div className="h-7 rounded-full w-1/3" style={{ background: 'var(--gray-200)' }} />
-        </div>
+    <div className="flex-shrink-0 w-[207px] animate-pulse">
+      <div className="w-[207px] h-[352px] rounded-[10px] bg-gray-200" />
+      <div className="flex flex-col gap-2 mt-3">
+        <div className="h-4 rounded bg-gray-200 w-3/4" />
+        <div className="h-3 rounded bg-gray-100 w-1/2" />
       </div>
     </div>
   );
@@ -61,8 +58,8 @@ export default function TrendingEventsPage() {
 
         {/* Loading */}
         {trendingLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center">
-            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-y-10 gap-x-6 justify-items-center">
+            {Array.from({ length: 10 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : trendingError ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -87,7 +84,7 @@ export default function TrendingEventsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-y-10 gap-x-6 justify-items-center"
           >
             {trending.map((event) => (
               <MovieCard
@@ -98,6 +95,7 @@ export default function TrendingEventsPage() {
                 description={event.description}
                 imageUrl={event.banner_url}
                 language={event.language}
+                eventType={event.event_type}
               />
             ))}
           </motion.div>

@@ -34,6 +34,8 @@ export interface EventData {
   language: string;
   event_type: string;
   status: string;
+  background_image_url?: string | null;
+  age_restriction?: string | null;
   rejection_reason: string | null;
   published_at: string | null;
   created_at: string;

@@ -141,7 +141,7 @@ export const fetchTrendingEventBySlug = createAsyncThunk<EventData, string>(
   'eventDetail/fetchTrendingBySlug',
   async (slug, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/events/trending/${slug}`);
+      const response = await fetch(`${BASE_URL}/events/${slug}`);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.success && result.data) return result.data as EventData;

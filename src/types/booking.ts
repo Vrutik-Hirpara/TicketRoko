@@ -73,6 +73,8 @@ export interface BookingEvent {
   title: string;
   description: string;
   bannerImage: string;
+  backgroundImageUrl?: string | null;
+  ageRestriction?: string | null;
   date: string;
   startTime: string;
   endTime: string;

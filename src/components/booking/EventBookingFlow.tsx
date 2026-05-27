@@ -66,7 +66,7 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
 
   return (
     <div className="min-h-screen min-w-0 overflow-x-hidden" style={{ background: 'var(--booking-bg)' }}>
-      <div className="container-max pt-4">
+      {/* <div className="container-max pt-4">
         <button
           type="button"
           onClick={() => router.back()}
@@ -76,7 +76,7 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
           <ChevronLeft className="w-4 h-4" />
           Back
         </button>
-      </div>
+      </div> */}
 
       {checkoutError && (
         <div className="container-max mb-4">
@@ -89,13 +89,15 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
         </div>
       )}
 
-      <EventBookingDetails
-        event={event}
-        selectedTiming={selectedTiming}
-        onSelectTiming={handleSelectTiming}
-        onBookTickets={handleBookTickets}
-        showSeatSection={showSeatSection}
-      />
+      {!showSeatSection && (
+        <EventBookingDetails
+          event={event}
+          selectedTiming={selectedTiming}
+          onSelectTiming={handleSelectTiming}
+          onBookTickets={handleBookTickets}
+          showSeatSection={showSeatSection}
+        />
+      )}
 
       {showSeatSection && selectedTiming && (
         <HallSeatSelection

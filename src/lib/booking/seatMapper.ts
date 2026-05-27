@@ -118,6 +118,8 @@ export function bookingPayloadToEvent(
     title: event.title,
     description: event.description || '',
     bannerImage: bannerUrl,
+    backgroundImageUrl: event.background_image_url || null,
+    ageRestriction: event.age_restriction || null,
     date: formatDisplayDate(event.event_date),
     startTime: start,
     endTime: formatDisplayTime(event.end_time),
@@ -129,7 +131,7 @@ export function bookingPayloadToEvent(
     totalSeats: totalSeats ?? event.total_tickets,
     availableSeats: availableSeats ?? event.total_tickets - event.sold_tickets,
     hallName: hall?.name,
-    showTimings: [start, '1:00 PM', '4:30 PM'],
+    showTimings: [start],
   };
 }
 
@@ -143,6 +145,8 @@ export function eventDataToBookingFromApi(event: EventData, bannerUrl: string): 
     title: event.title,
     description: event.description || '',
     bannerImage: bannerUrl,
+    backgroundImageUrl: event.background_image_url || null,
+    ageRestriction: event.age_restriction || null,
     date: formatDisplayDate(event.event_date),
     startTime: start,
     endTime: formatDisplayTime(event.end_time),
@@ -153,6 +157,6 @@ export function eventDataToBookingFromApi(event: EventData, bannerUrl: string): 
     ticketPrice,
     totalSeats: event.total_tickets,
     availableSeats: event.total_tickets - event.sold_tickets,
-    showTimings: [start, '1:00 PM', '4:30 PM'],
+    showTimings: [start],
   };
 }
