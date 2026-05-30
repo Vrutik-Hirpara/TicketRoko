@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { RootState } from '../../store';
@@ -14,6 +15,7 @@ import { Input } from '../ui/Input';
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const isOpen = useSelector((state: RootState) => state.ui.isSidebarOpen);
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
 
@@ -88,6 +90,7 @@ export const Sidebar = () => {
                       onClick={() => {
                         dispatch(logout());
                         dispatch(toggleSidebar());
+                        window.location.href = '/login';
                       }} 
                       variant="outline" 
                       className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center justify-center gap-2 mt-2"

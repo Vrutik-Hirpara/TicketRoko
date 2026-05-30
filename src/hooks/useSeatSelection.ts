@@ -4,9 +4,21 @@ import { useCallback, useMemo, useState } from 'react';
 import type { SeatData } from '../types/booking';
 import { formatCurrency } from '../lib/booking/seatLayout';
 import { getBookableSeats } from '../lib/booking/seatMapper';
+import { getPendingBooking } from '../lib/booking/pendingBooking';
 
-export function useSeatSelection(seats: SeatData[]) {
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+export function useSeatSelection(seats: SeatData[], eventSlug?: string) {
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => {
+    if (typeof window !== 'undefined') {
+      const pending = getPendingBooking();
+      if (pending && pending.seatIds && (!eventSlug || pending.eventSlug === eventSlug)) {
+        const validIds = pending.seatIds.filter((id) => seats.some((s) => s.id === id));
+        if (validIds.length > 0) {
+          return new Set(validIds);
+        }
+      }
+    }
+    return new Set();
+  });
 
   const bookableSeats = useMemo(() => getBookableSeats(seats), [seats]);
 

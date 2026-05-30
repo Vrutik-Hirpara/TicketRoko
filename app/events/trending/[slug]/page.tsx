@@ -52,7 +52,7 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
     >
       <Image src={src} alt={title} fill sizes={mobile ? '200px' : '240px'} className="object-cover" priority />
 
-      {/* <div className="absolute bottom-10 left-0 right-0 flex justify-center">
+      <div className="absolute bottom-10 left-0 right-0 flex justify-center">
         <span
           className="text-[11px] font-bold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all hover:scale-105"
           style={{
@@ -64,9 +64,9 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         >
           ▶ Trailer
         </span>
-      </div> */}
+      </div>
 
-      {/* <div
+      <div
         className="absolute bottom-0 left-0 right-0 text-center text-[11px] font-bold py-2"
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 100%)',
@@ -74,7 +74,7 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         }}
       >
         In cinemas
-      </div> */}
+      </div>
     </motion.div>
   );
 }
@@ -130,15 +130,7 @@ export default function TrendingEventDetailPage() {
     return dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
-  const { token, isAuthenticated } = useSelector((state: RootState) => state.auth);
-
-  const goToBooking = () => {
-    if (!isAuthenticated || !token) {
-      router.push(`/login?returnUrl=${encodeURIComponent(`/events/${eventSlug}/book`)}`);
-      return;
-    }
-    router.push(`/events/${eventSlug}/book`);
-  };
+  const goToBooking = () => router.push(`/events/${eventSlug}/book`);
 
 // Using shared utility to resolve image URLs
 

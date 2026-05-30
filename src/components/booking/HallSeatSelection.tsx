@@ -36,7 +36,7 @@ export function HallSeatSelection({
     totalAmount,
     toggleSeat,
     selectedIds,
-  } = useSeatSelection(seats);
+  } = useSeatSelection(seats, event.slug);
 
   const handleProceed = () => {
     onProceed({

@@ -4,7 +4,7 @@ import { FormEvent, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthPageLayout } from '../../src/components/auth/AuthPageLayout';
 import { loginUser } from '../../src/controllers/authController';
@@ -28,6 +28,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,20 +119,32 @@ function LoginForm() {
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               name="password"
               autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none focus:ring-2"
+              className="w-full pl-10 pr-10 py-3 rounded-xl text-sm outline-none focus:ring-2"
               style={{
                 background: 'var(--booking-surface-elevated)',
                 color: 'var(--booking-text)',
                 border: '1px solid var(--booking-border)',
               }}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-200 transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <Eye className="w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
+              ) : (
+                <EyeOff className="w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
+              )}
+            </button>
           </div>
         </div>
 

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search, MapPin, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,10 +12,12 @@ import { logout as logoutAction } from '../../store/authSlice';
 
 export const Navbar = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
     dispatch(logoutAction());
+    window.location.href = '/login';
   };
 
   return (

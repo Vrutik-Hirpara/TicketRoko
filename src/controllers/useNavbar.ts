@@ -33,6 +33,7 @@ export const useNavbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    window.location.href = '/login';
   };
 
   return {
