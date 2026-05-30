@@ -52,7 +52,7 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
     >
       <Image src={src} alt={title} fill sizes={mobile ? '200px' : '240px'} className="object-cover" priority />
 
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center">
+      {/* <div className="absolute bottom-10 left-0 right-0 flex justify-center">
         <span
           className="text-[11px] font-bold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all hover:scale-105"
           style={{
@@ -64,9 +64,9 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         >
           ▶ Trailer
         </span>
-      </div>
+      </div> */}
 
-      <div
+      {/* <div
         className="absolute bottom-0 left-0 right-0 text-center text-[11px] font-bold py-2"
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 100%)',
@@ -74,37 +74,37 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         }}
       >
         In cinemas
-      </div>
+      </div> */}
     </motion.div>
   );
 }
 
-function InterestBox({ label, mobile = false }: { label: string; mobile?: boolean }) {
-  return (
-    <div
-      className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
-        mobile ? 'w-full px-4 py-3' : 'gap-4 px-5 py-3.5 self-start'
-      }`}
-      style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
-    >
-      <div className="flex items-center gap-2 text-left">
-        <span className="text-2xl">👍</span>
-        <div>
-          <p className="text-[14px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
-          <p className="text-[11px]" style={{ color: 'var(--gray-300)' }}>
-            {mobile ? 'Reviews trigger rating status.' : 'Rating will appear once reviews come in.'}
-          </p>
-        </div>
-      </div>
-      <button
-        className="text-[13px] font-semibold px-3 py-1.5 rounded transition hover:bg-white/10"
-        style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
-      >
-        Rate now
-      </button>
-    </div>
-  );
-}
+// function InterestBox({ label, mobile = false }: { label: string; mobile?: boolean }) {
+//   return (
+//     <div
+//       className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
+//         mobile ? 'w-full px-4 py-3' : 'gap-4 px-5 py-3.5 self-start'
+//       }`}
+//       style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
+//     >
+//       <div className="flex items-center gap-2 text-left">
+//         <span className="text-2xl">👍</span>
+//         <div>
+//           <p className="text-[14px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
+//           <p className="text-[11px]" style={{ color: 'var(--gray-300)' }}>
+//             {mobile ? 'Reviews trigger rating status.' : 'Rating will appear once reviews come in.'}
+//           </p>
+//         </div>
+//       </div>
+//       <button
+//         className="text-[13px] font-semibold px-3 py-1.5 rounded transition hover:bg-white/10"
+//         style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
+//       >
+//         Rate now
+//       </button>
+//     </div>
+//   );
+// }
 
 // ══════════ MAIN TRENDING EVENT DETAIL VIEW ══════════
 
@@ -130,7 +130,15 @@ export default function TrendingEventDetailPage() {
     return dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
-  const goToBooking = () => router.push(`/events/${eventSlug}/book`);
+  const { token, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const goToBooking = () => {
+    if (!isAuthenticated || !token) {
+      router.push(`/login?returnUrl=${encodeURIComponent(`/events/${eventSlug}/book`)}`);
+      return;
+    }
+    router.push(`/events/${eventSlug}/book`);
+  };
 
 // Using shared utility to resolve image URLs
 
@@ -192,7 +200,7 @@ export default function TrendingEventDetailPage() {
             <h1 className="text-3xl md:text-[2.65rem] font-extrabold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
               {event.title}
             </h1>
-            <InterestBox label={interestedLabel} />
+            {/* <InterestBox label={interestedLabel} /> */}
             {/* Metadata (Type, Age Restriction, Date, City) */}
             <div className="flex flex-wrap items-center gap-2.5 text-[15px]" style={{ color: 'var(--gray-200)' }}>
               {event.event_type && (
@@ -239,7 +247,7 @@ export default function TrendingEventDetailPage() {
             <h1 className="text-2xl font-bold leading-tight tracking-wide" style={{ color: 'var(--white)' }}>
               {event.title}
             </h1>
-            <InterestBox label={interestedLabel} mobile />
+            {/* <InterestBox label={interestedLabel} mobile /> */}
             
             {/* Mobile Meta Tags */}
             <div className="flex flex-wrap items-center justify-center gap-2 text-[12px]" style={{ color: 'var(--gray-300)' }}>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { SeatData, SectionSummary } from '../../types/booking';
 import {
   computeCanvasBounds,
@@ -37,6 +38,9 @@ export function SeatMap({
 }: SeatMapProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [zoomDelta, setZoomDelta] = useState(0);
+
+  // Track the hovered seat button's screen rect for fixed-position tooltip
+  const [tooltipAnchor, setTooltipAnchor] = useState<DOMRect | null>(null);
 
   const bookableSeats = useMemo(() => getBookableSeats(seats), [seats]);
   const bounds = useMemo(() => computeCanvasBounds(seats), [seats]);
@@ -80,9 +84,34 @@ export function SeatMap({
     [bookableSeats, hoveredId],
   );
 
-  const handleHover = useCallback((id: number | null) => setHoveredId(id), []);
+  // Clear anchor when seat is un-hovered
+  useEffect(() => {
+    if (hoveredId === null) setTooltipAnchor(null);
+  }, [hoveredId]);
+
+  const handleHover = useCallback(
+    (id: number | null, rect?: DOMRect) => {
+      setHoveredId(id);
+      setTooltipAnchor(id !== null && rect ? rect : null);
+    },
+    [],
+  );
 
   const needsScrollHint = scale < 0.95 || bounds.width > 400;
+
+  // Compute fixed tooltip position: centered above the hovered seat button
+  const tooltipStyle = useMemo<React.CSSProperties | null>(() => {
+    if (!tooltipAnchor) return null;
+    const TOOLTIP_MARGIN = 10; // px gap between seat top and tooltip bottom
+    return {
+      position: 'fixed',
+      left: tooltipAnchor.left + tooltipAnchor.width / 2,
+      top: tooltipAnchor.top - TOOLTIP_MARGIN,
+      transform: 'translate(-50%, -100%)',
+      zIndex: 9999,
+      pointerEvents: 'none',
+    };
+  }, [tooltipAnchor]);
 
   return (
     <div className="w-full min-w-0 flex flex-col items-center">
@@ -195,27 +224,24 @@ export function SeatMap({
                   onHover={handleHover}
                 />
               ))}
-
-              {hoveredSeat && hoveredSeat.status !== 'sold' && (
-                <div
-                  className="absolute z-50 pointer-events-none"
-                  style={{
-                    left: hoveredSeat.x_pos - bounds.minX + SEAT_SIZE / 2,
-                    top: hoveredSeat.y_pos - bounds.minY - 8,
-                    transform: 'translate(-50%, -100%)',
-                  }}
-                >
-                  <SeatTooltip
-                    seatName={hoveredSeat.seat_name}
-                    price={hoveredSeat.price}
-                    sectionLabel={hoveredSeat.section_label}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* ── Fixed-position tooltip (escapes overflow clipping) ── */}
+      {hoveredSeat && hoveredSeat.status !== 'sold' && tooltipStyle &&
+        createPortal(
+          <div style={tooltipStyle}>
+            <SeatTooltip
+              seatName={hoveredSeat.seat_name}
+              price={hoveredSeat.price}
+              sectionLabel={hoveredSeat.section_label}
+            />
+          </div>,
+          document.body,
+        )
+      }
 
       {needsScrollHint && (
         <p

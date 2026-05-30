@@ -32,8 +32,8 @@ interface EventBookingFlowProps {
 
 export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingFlowProps) {
   const router = useRouter();
-  const [selectedTiming, setSelectedTiming] = useState<string | null>(null);
-  const [showSeatSection, setShowSeatSection] = useState(false);
+  const [selectedTiming, setSelectedTiming] = useState<string | null>(event.startTime || event.showTimings[0] || null);
+  const [showSeatSection, setShowSeatSection] = useState(true);
 
   const { proceedToCheckout, submitting, error: checkoutError } = useBookingCheckout(
     event,
@@ -101,6 +101,7 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
 
       {showSeatSection && selectedTiming && (
         <HallSeatSelection
+          event={event}
           seats={seats}
           sectionSummary={sectionSummary}
           hallName={event.hallName}

@@ -55,7 +55,7 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
       <Image src={src} alt={title} fill sizes={mobile ? '200px' : '240px'} className="object-cover" priority />
       
       {/* Trailer button */}
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center">
+      {/* <div className="absolute bottom-10 left-0 right-0 flex justify-center">
         <span 
           className="text-[11px] font-bold px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all hover:scale-105" 
           style={{ 
@@ -67,10 +67,10 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         >
           ▶ Trailer
         </span>
-      </div>
+      </div> */}
 
       {/* In cinemas bottom strip */}
-      <div 
+      {/* <div 
         className="absolute bottom-0 left-0 right-0 text-center text-[11px] font-bold py-2" 
         style={{ 
           background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 100%)', 
@@ -78,38 +78,38 @@ function EventPoster({ src, title, mobile = false }: { src: string; title: strin
         }}
       >
         In cinemas
-      </div>
+      </div> */}
     </motion.div>
   );
 }
 
 // 3. Reusable Thumbs-Up Interest Rating Box
-function InterestBox({ label, mobile = false }: { label: string; mobile?: boolean }) {
-  return (
-    <div 
-      className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
-        mobile ? 'w-full px-4 py-3' : 'gap-4 px-5 py-3.5 self-start'
-      }`}
-      style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
-    >
-      <div className="flex items-center gap-2 text-left">
-        <span className="text-2xl">👍</span>
-        <div>
-          <p className="text-[14px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
-          <p className="text-[11px]" style={{ color: 'var(--gray-300)' }}>
-            {mobile ? 'Reviews trigger rating status.' : 'Rating will appear once reviews come in.'}
-          </p>
-        </div>
-      </div>
-      <button 
-        className="text-[13px] font-semibold px-3 py-1.5 rounded transition hover:bg-white/10"
-        style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
-      >
-        Rate now
-      </button>
-    </div>
-  );
-}
+// function InterestBox({ label, mobile = false }: { label: string; mobile?: boolean }) {
+//   return (
+//     <div 
+//       className={`flex items-center justify-between rounded-lg backdrop-blur-sm ${
+//         mobile ? 'w-full px-4 py-3' : 'gap-4 px-5 py-3.5 self-start'
+//       }`}
+//       style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
+//     >
+//       <div className="flex items-center gap-2 text-left">
+//         <span className="text-2xl">👍</span>
+//         <div>
+//           <p className="text-[14px] font-bold" style={{ color: 'var(--white)' }}>{label}</p>
+//           <p className="text-[11px]" style={{ color: 'var(--gray-300)' }}>
+//             {mobile ? 'Reviews trigger rating status.' : 'Rating will appear once reviews come in.'}
+//           </p>
+//         </div>
+//       </div>
+//       <button 
+//         className="text-[13px] font-semibold px-3 py-1.5 rounded transition hover:bg-white/10"
+//         style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--white)', border: '1px solid rgba(255, 255, 255, 0.15)' }}
+//       >
+//         Rate now
+//       </button>
+//     </div>
+//   );
+// }
 
 // ══════════ MAIN EVENT DETAIL VIEW ══════════
 
@@ -143,7 +143,15 @@ export default function EventDetailPage() {
     ? `${(interestedCount / 1000).toFixed(1)}K+ are interested`
     : `${interestedCount} are interested`;
 
-  const goToBooking = () => router.push(`/events/${eventSlug}/book`);
+  const { token, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const goToBooking = () => {
+    if (!isAuthenticated || !token) {
+      router.push(`/login?returnUrl=${encodeURIComponent(`/events/${eventSlug}/book`)}`);
+      return;
+    }
+    router.push(`/events/${eventSlug}/book`);
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--banner-to)' }}>
@@ -215,7 +223,7 @@ export default function EventDetailPage() {
             </h1>
 
             {/* Thumbs up rating box */}
-            <InterestBox label={interestedLabel} />
+            {/* <InterestBox label={interestedLabel} /> */}
 
             {/* Metadata (Type, Age Restriction, Date, City) */}
             <div className="flex flex-wrap items-center gap-2.5 text-[15px]" style={{ color: 'var(--gray-200)' }}>
@@ -283,7 +291,7 @@ export default function EventDetailPage() {
             </h1>
 
             {/* Mobile Thumbs up rating box */}
-            <InterestBox label={interestedLabel} mobile />
+            {/* <InterestBox label={interestedLabel} mobile /> */}
 
             {/* Mobile Meta Tags */}
             <div className="flex flex-wrap items-center justify-center gap-2 text-[12px]" style={{ color: 'var(--gray-300)' }}>

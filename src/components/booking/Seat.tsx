@@ -17,7 +17,8 @@ interface SeatProps {
   top: number;
   style: SeatStyle;
   onToggle: (seat: SeatData) => void;
-  onHover: (seatId: number | null) => void;
+  /** Pass the button's screen DOMRect so the parent can position the tooltip via fixed positioning */
+  onHover: (seatId: number | null, rect?: DOMRect) => void;
 }
 
 function SeatComponent({ seat, visualState, left, top, style, onToggle, onHover }: SeatProps) {
@@ -29,9 +30,9 @@ function SeatComponent({ seat, visualState, left, top, style, onToggle, onHover 
       type="button"
       disabled={isSold}
       onClick={() => onToggle(seat)}
-      onMouseEnter={() => onHover(seat.id)}
+      onMouseEnter={(e) => onHover(seat.id, (e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       onMouseLeave={() => onHover(null)}
-      onFocus={() => onHover(seat.id)}
+      onFocus={(e) => onHover(seat.id, (e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       onBlur={() => onHover(null)}
       aria-label={`Seat ${seat.seat_name}${isSold ? ', sold' : isSelected ? ', selected' : ', available'}`}
       aria-pressed={isSelected}
