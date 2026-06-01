@@ -31,7 +31,7 @@ export default function RootLayout({
           <Navbar />
           <Sidebar />
           <div className="mt-[64px] md:mt-[72px]">
-            {/* <CategoryNav /> */}
+            <CategoryNav />
             <main>
               {children}
             </main>

@@ -104,7 +104,10 @@ export const Navbar = () => {
   {/* Login / Auth Button */}
   {hydrated && isAuthenticated ? (
     <div className="flex items-center gap-4 flex-shrink-0">
-      <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100">
+      <div 
+        onClick={handleToggleMenu}
+        className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
+      >
         <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shadow-sm select-none">
           {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
         </div>
@@ -117,15 +120,13 @@ export const Navbar = () => {
           </span>
         </div>
       </div>
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleLogout}
-        className="flex items-center gap-1.5 text-gray-500 hover:text-red-600 px-3.5 py-2 rounded-full text-sm font-medium transition-colors hover:bg-red-50"
+      <button 
+        className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+        onClick={handleToggleMenu}
+        aria-label="Toggle menu"
       >
-        <LogOut className="h-4 w-4" />
-        <span className="hidden md:inline">Logout</span>
-      </motion.button>
+        <Menu className="w-6 h-6" />
+      </button>
     </div>
   ) : (
     <Link href="/login">

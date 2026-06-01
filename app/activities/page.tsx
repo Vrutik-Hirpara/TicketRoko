@@ -1,9 +1,6 @@
-import React from 'react'
+import React from 'react';
+import { CategoryView } from '../../src/components/layout/CategoryView';
 
-const page = () => {
-  return (
-    <div>activities</div>
-  )
+export default function ActivitiesPage() {
+  return <CategoryView categoryType="activity" title="Activities" />;
 }
-
-export default page

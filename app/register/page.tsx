@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthPageLayout } from '../../src/components/auth/AuthPageLayout';
+import { GoogleLoginButton } from '../../src/components/auth/GoogleLoginButton';
 import { registerUser } from '../../src/controllers/authController';
 import { setCredentials } from '../../src/store/authSlice';
 import { useCompletePendingBooking } from '../../src/hooks/useCompletePendingBooking';
@@ -21,7 +22,6 @@ function RegisterForm() {
   const returnUrl = searchParams.get('returnUrl') || '/';
   const checkout = searchParams.get('checkout') === '1';
 
-  // Build clean URL without redundant query parameters
   const loginHref = (returnUrl === '/' && !checkout)
     ? '/login'
     : `/login?returnUrl=${encodeURIComponent(returnUrl)}${checkout ? '&checkout=1' : ''}`;
@@ -45,14 +45,13 @@ function RegisterForm() {
       if (res.token) {
         dispatch(setCredentials({ token: res.token, user: res.user }));
       }
-      
-      // Clear fields
+
       setName('');
       setEmail('');
       setPassword('');
-      
+
       setSuccess('Registration successful! Redirecting to login...');
-      
+
       setTimeout(() => {
         router.push(loginHref);
       }, 3000);
@@ -61,6 +60,11 @@ function RegisterForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (token: string, user: any) => {
+    dispatch(setCredentials({ token, user }));
+    await completeIfPending(returnUrl, checkout);
   };
 
   const busy = loading || completing || !!success;
@@ -87,6 +91,21 @@ function RegisterForm() {
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Google Sign-In */}
+        <div className="flex flex-col gap-3">
+          <GoogleLoginButton
+            returnUrl={returnUrl}
+            mode="register"
+            onSuccess={handleGoogleSuccess}
+            onError={(msg) => setError(msg)}
+          />
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: 'var(--booking-border)' }} />
+            <span className="text-xs" style={{ color: 'var(--booking-text-muted)' }}>or</span>
+            <div className="flex-1 h-px" style={{ background: 'var(--booking-border)' }} />
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
           {error && (
             <motion.div
@@ -188,7 +207,7 @@ function RegisterForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-200 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (

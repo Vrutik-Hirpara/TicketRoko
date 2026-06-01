@@ -162,6 +162,7 @@ export const RecommendedMovies = () => {
                   imageUrl={movie.banner_url}
                   language={movie.language}
                   eventType={movie.event_type}
+                  eventDate={movie.event_date}
                   onClick={() => handleCardClick(movie.slug)}
                 />
               </div>

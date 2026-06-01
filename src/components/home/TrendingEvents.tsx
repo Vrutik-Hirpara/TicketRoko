@@ -165,6 +165,7 @@ export const TrendingEvents = () => {
                   imageUrl={event.banner_url}
                   language={event.language}
                   eventType={event.event_type}
+                  eventDate={event.event_date}
                   onClick={() => handleCardClick(event.slug)}
                 />
               </div>

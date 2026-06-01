@@ -14,6 +14,7 @@ interface MovieCardProps {
   imageUrl?: string | null;
   language?: string;
   eventType?: string;
+  eventDate?: string;
   onClick?: () => void;
 }
 
@@ -25,6 +26,7 @@ export const MovieCard = ({
   imageUrl,
   language,
   eventType,
+  eventDate,
   onClick,
 }: MovieCardProps) => {
   const router = useRouter();
@@ -37,12 +39,18 @@ export const MovieCard = ({
     }
   };
 
-  // Generate deterministic rating and votes count based on id to match BookMyShow feel
-  const ratingBase = 8.0 + ((id * 17) % 19) / 10; // returns 8.0 to 9.8
-  const votesBase = ((id * 137) % 99) + 1; // returns 1 to 100
-  const votesText = votesBase > 50 ? `${(votesBase / 10).toFixed(1)}K` : `${votesBase * 100}`;
-  const ratingStr = `${ratingBase.toFixed(1)}/10`;
-  const votesStr = `${votesText}+ Votes`;
+  const formattedDate = eventDate ? (() => {
+    try {
+      const d = new Date(eventDate);
+      if (isNaN(d.getTime())) return eventDate;
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return eventDate;
+    }
+  })() : '';
 
   return (
     <motion.div
@@ -59,6 +67,11 @@ export const MovieCard = ({
           priority
           className="object-cover object-center"
         />
+        {formattedDate && (
+          <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white text-[13px] font-medium px-2 py-1.5 flex items-center justify-center gap-1.5">
+            <span>{formattedDate}</span>
+          </div>
+        )}
       </div>
 
       {/* CONTENT BELOW IMAGE */}

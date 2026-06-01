@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -8,16 +8,71 @@ import { RootState } from '../../store';
 import { toggleSidebar } from '../../store/uiSlice';
 import { logout } from '../../store/authSlice';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, MapPin, ChevronRight, LogOut } from 'lucide-react';
+import { 
+  X, 
+  ChevronRight, 
+  LogOut, 
+  Ticket, 
+  History, 
+  Calendar, 
+  HelpCircle, 
+  Settings, 
+  Handshake, 
+  Info,
+  User as UserIcon
+} from 'lucide-react';
 import { Typography } from '../ui/Typography';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const isOpen = useSelector((state: RootState) => state.ui.isSidebarOpen);
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
+
+  const handleSignOut = () => {
+    dispatch(logout());
+    dispatch(toggleSidebar());
+    window.location.href = '/login';
+  };
+
+  const menuItems = [
+    { 
+      label: 'My Orders', 
+      sublabel: 'View all your bookings & purchases', 
+      icon: Ticket, 
+      href: '/profile/orders' 
+    },
+    { 
+      label: 'Past Events', 
+      sublabel: 'View events you have attended', 
+      icon: History, 
+      href: '/profile/past-events' 
+    },
+    { 
+      label: 'Upcoming Events', 
+      sublabel: 'Your upcoming booked experiences', 
+      icon: Calendar, 
+      href: '/profile/upcoming' 
+    },
+    { 
+      label: 'Help & Support', 
+      sublabel: 'View commonly asked queries and Chat', 
+      icon: HelpCircle, 
+      href: '/help' 
+    },
+    { 
+      label: 'Accounts & Settings', 
+      sublabel: 'Location, Payments, Permissions & More', 
+      icon: Settings, 
+      href: '/settings' 
+    },
+    { 
+      label: 'Partner With Us', 
+      sublabel: 'List your event or collaborate with us', 
+      icon: Handshake, 
+      href: '/partner' 
+    },
+  ];
 
   return (
     <AnimatePresence>
@@ -29,7 +84,7 @@ export const Sidebar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => dispatch(toggleSidebar())}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
           />
 
           {/* Sidebar Panel */}
@@ -37,76 +92,119 @@ export const Sidebar = () => {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-[300px] bg-white z-[70] shadow-2xl p-6 flex flex-col"
+            transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+            className="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white z-[70] shadow-2xl flex flex-col overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-8">
-              <Typography variant="h3">Menu</Typography>
-              <button 
-                onClick={() => dispatch(toggleSidebar())}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-8 flex-1">
-              {/* Search in Mobile */}
-              <div className="flex flex-col gap-3">
-                <Typography variant="span" className="text-gray-500 font-bold uppercase tracking-wider">Search</Typography>
-                <Input 
-                  icon={<Search className="w-5 h-5" />}
-                  placeholder="Movies, Events..."
-                />
-              </div>
-
-              {/* Location in Mobile */}
-              <div className="flex flex-col gap-3">
-                <Typography variant="span" className="text-gray-500 font-bold uppercase tracking-wider">Location</Typography>
-                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
-                  <MapPin className="w-5 h-5 text-primary-blue" />
-                  <Typography className="font-bold">Ahmedabad</Typography>
-                </div>
-              </div>
-
-              {/* Auth */}
-              <div className="mt-auto">
+            {/* Header: Hey! Edit Profile */}
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white relative">
+              <div className="flex flex-col text-left">
+                <Typography variant="h3" className="text-gray-900 font-bold leading-tight">
+                  Hey! {hydrated && isAuthenticated && user?.name ? user.name : ''}
+                </Typography>
                 {hydrated && isAuthenticated ? (
-                  <div className="flex flex-col gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-base shadow-sm select-none">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="text-sm font-semibold text-gray-800 leading-tight">
-                          {user?.name}
-                        </span>
-                        <span className="text-xs text-gray-400 leading-tight">
-                          {user?.role || 'User'}
-                        </span>
-                      </div>
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        dispatch(logout());
-                        dispatch(toggleSidebar());
-                        window.location.href = '/login';
-                      }} 
-                      variant="outline" 
-                      className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center justify-center gap-2 mt-2"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </Button>
-                  </div>
-                ) : (
-                  <Link href="/login" onClick={() => dispatch(toggleSidebar())}>
-                    <Button className="w-full bg-[#2563EB] hover:bg-[#1d4ed8]">
-                      Login <ChevronRight className="w-5 h-5 ml-2" />
-                    </Button>
+                  <Link 
+                    href="/profile" 
+                    onClick={() => dispatch(toggleSidebar())}
+                    className="text-xs text-gray-500 hover:text-primary flex items-center gap-0.5 mt-1 font-medium transition-colors"
+                  >
+                    Edit Profile <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
+                ) : (
+                  <span className="text-xs text-gray-500 mt-1">Unlock helpful features by logging in</span>
                 )}
               </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
+                  <UserIcon className="w-6 h-6" />
+                </div>
+                <button 
+                  onClick={() => dispatch(toggleSidebar())}
+                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors absolute top-3 right-3"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Info Banner: Get tickets on Whatsapp/SMS */}
+            <div className="bg-[#FFFDF5] border-b border-[#FEF3C7] px-5 py-3.5 flex items-start gap-3">
+              <Info className="w-5 h-5 text-[#D97706] shrink-0 mt-0.5" />
+              <div className="flex flex-col text-left">
+                <span className="text-[13px] font-semibold text-[#92400E]">
+                  Get tickets on Whatsapp/SMS!
+                </span>
+                <span className="text-xs text-[#B45309] mt-0.5">
+                  Add your Mobile Number
+                </span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#D97706] ml-auto self-center" />
+            </div>
+
+            {/* Menu Items */}
+            <div className="flex-1 overflow-y-auto py-2">
+              {menuItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Link 
+                    key={index} 
+                    href={hydrated && isAuthenticated ? item.href : '/login'} 
+                    onClick={() => dispatch(toggleSidebar())}
+                    className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 group"
+                  >
+                    <Icon className="w-5 h-5 text-gray-500 group-hover:text-primary-blue transition-colors" />
+                    <div className="flex flex-col text-left">
+                      <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900 transition-colors">
+                        {item.label}
+                      </span>
+                      <span className="text-[11px] text-gray-400 mt-0.5">
+                        {item.sublabel}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-gray-400 transition-colors" />
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Footer: Signout/Login Button */}
+            <div className="p-5 border-t border-gray-100 bg-white">
+              {hydrated && isAuthenticated ? (
+                <button
+                  onClick={handleSignOut}
+                  className="w-full py-3 rounded-xl border font-bold text-base transition-all duration-200 flex items-center justify-center gap-2"
+                  style={{
+                    borderColor: 'var(--primary-blue)',
+                    color: 'var(--primary-blue)',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(37, 99, 235, 0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <LogOut className="w-5 h-5" />
+                  Sign out
+                </button>
+              ) : (
+                <Link href="/login" onClick={() => dispatch(toggleSidebar())}>
+                  <button
+                    className="w-full py-3 rounded-xl font-bold text-base text-white transition-all duration-200 flex items-center justify-center gap-2"
+                    style={{
+                      backgroundColor: 'var(--primary-blue)',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue)';
+                    }}
+                  >
+                    Sign in
+                  </button>
+                </Link>
+              )}
             </div>
           </motion.div>
         </>
@@ -114,4 +212,3 @@ export const Sidebar = () => {
     </AnimatePresence>
   );
 };
-
