@@ -130,7 +130,28 @@ export default function TrendingEventDetailPage() {
     return dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
-  const goToBooking = () => router.push(`/events/${eventSlug}/book`);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const goToBooking = async () => {
+    try {
+      const { getStoredRefreshToken, setStoredAuth, clearStoredAuth } = await import('../../../../src/lib/auth/storage');
+      const refreshToken = getStoredRefreshToken();
+      if (refreshToken) {
+        const { refreshAuthToken } = await import('../../../../src/controllers/authController');
+        const { setCredentials } = await import('../../../../src/store/authSlice');
+        const { accessToken } = await refreshAuthToken(refreshToken);
+        if (user) {
+          setStoredAuth(accessToken, user);
+          dispatch(setCredentials({ user, token: accessToken }));
+        }
+      }
+    } catch (err) {
+      const { clearStoredAuth } = await import('../../../../src/lib/auth/storage');
+      clearStoredAuth();
+      router.push(`/login?returnUrl=/events/trending/${eventSlug}/book&checkout=1`);
+      return;
+    }
+    router.push(`/events/${eventSlug}/book`);
+  };
 
 // Using shared utility to resolve image URLs
 

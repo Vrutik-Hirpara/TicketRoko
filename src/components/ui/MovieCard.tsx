@@ -15,6 +15,7 @@ interface MovieCardProps {
   language?: string;
   eventType?: string;
   eventDate?: string;
+  ticketPrice?: string | number;
   onClick?: () => void;
 }
 
@@ -27,6 +28,7 @@ export const MovieCard = ({
   language,
   eventType,
   eventDate,
+  ticketPrice,
   onClick,
 }: MovieCardProps) => {
   const router = useRouter();
@@ -43,10 +45,10 @@ export const MovieCard = ({
     try {
       const d = new Date(eventDate);
       if (isNaN(d.getTime())) return eventDate;
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const day = d.getDate();
+      const month = d.toLocaleDateString('en-US', { month: 'short' });
+      return `${weekday}, ${day} ${month}`;
     } catch {
       return eventDate;
     }
@@ -85,6 +87,13 @@ export const MovieCard = ({
         <p className="text-[13px] leading-[18px] text-gray-500 mt-1 line-clamp-1">
           {eventType || description || 'Event'}
         </p>
+
+        {/* TICKET PRICE */}
+        {/* {ticketPrice && (
+          <p className="text-[13px] leading-[18px] text-gray-900 font-medium mt-1">
+            ₹ {parseFloat(ticketPrice.toString()).toLocaleString('en-IN')} onwards
+          </p>
+        )} */}
       </div>
     </motion.div>
   );

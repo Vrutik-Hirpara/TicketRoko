@@ -1,70 +1,56 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
 import { usePathname } from 'next/navigation';
+import { AppDispatch, RootState } from '../../store';
+import { fetchCategories } from '../../controllers/categoryController';
 
 export const CategoryNav = () => {
   const pathname = usePathname();
+  const dispatch = useDispatch<AppDispatch>();
+  const { categories, categoriesLoading } = useSelector((state: RootState) => state.categories);
 
-  const categories = [
-    { name: 'Movies', href: '/movies' },
-    { name: 'Stream', href: '/stream' },
-    { name: 'Events', href: '/events' },
-    { name: 'Plays', href: '/plays' },
-    { name: 'Sports', href: '/sports' },
-    { name: 'Activities', href: '/activities' },
-  ];
+  useEffect(() => {
+    if (categories.length === 0) dispatch(fetchCategories());
+  }, [dispatch, categories.length]);
 
-  const rightOptions = [
-    { name: 'ListYourShow', href: '/list-your-show' },
-    { name: 'Corporates', href: '/corporates' },
-    { name: 'Offers', href: '/offers' },
-    { name: 'Gift Cards', href: '/giftcards' },
-  ];
-
-  // Don't show category bar on login/register/booking pages
-  const shouldHide = pathname === '/login' || pathname === '/register' || pathname.startsWith('/booking');
+  const shouldHide =
+    pathname === '/login' || pathname === '/register' || pathname.startsWith('/booking');
   if (shouldHide) return null;
 
   return (
     <div className="w-full bg-[#F5F5F5] border-b border-gray-200">
       <div className="container-max flex items-center justify-between h-[42px] overflow-x-auto no-scrollbar">
-        {/* Left Categories (Scrollable on mobile) */}
         <div className="flex items-center gap-6 whitespace-nowrap py-1">
-          {categories.map((cat) => {
-            const isActive = pathname === cat.href;
-            return (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className={`text-[13px] transition-colors duration-150 ${
-                  isActive ? 'text-[#2563EB] font-bold' : 'text-gray-700 hover:text-[#2563EB] font-medium'
-                }`}
-              >
-                {cat.name}
-              </Link>
-            );
-          })}
+          {categoriesLoading ? (
+            <>
+              {[1, 2, 3, 4].map((i) => (
+                <span key={i} className="h-4 w-16 bg-gray-200 rounded animate-pulse inline-block" />
+              ))}
+            </>
+          ) : categories.length === 0 ? (
+            <span className="text-gray-400 text-[13px]">No categories</span>
+          ) : (
+            categories.map((cat) => {
+              const isActive = pathname === `/category/${cat.slug}`;
+              return (
+                <Link
+                  key={cat.slug}
+                  href={`/category/${cat.slug}`}
+                  className={`text-[13px] transition-colors duration-150 ${
+                    isActive
+                      ? 'text-[var(--primary-blue)] font-bold'
+                      : 'text-gray-700 hover:text-[var(--primary-blue)] font-medium'
+                  }`}
+                >
+                  {cat.name}
+                </Link>
+              );
+            })
+          )}
         </div>
-
-        {/* Right Options (Hidden on smaller screens to match BookMyShow) */}
-        {/* <div className="hidden lg:flex items-center gap-6 whitespace-nowrap">
-          {rightOptions.map((opt) => {
-            const isActive = pathname === opt.href;
-            return (
-              <Link
-                key={opt.name}
-                href={opt.href}
-                className={`text-[12px] transition-colors duration-150 ${
-                  isActive ? 'text-[#2563EB] font-bold' : 'text-gray-500 hover:text-[#2563EB] font-medium'
-                }`}
-              >
-                {opt.name}
-              </Link>
-            );
-          })}
-        </div> */}
       </div>
     </div>
   );

@@ -129,10 +129,12 @@ export const HeroBanner = () => {
                 onClick={() => {
                   if (!isActive && isDesktop) {
                     setCurrent(index);
+                  } else if (isActive && label.url_link) {
+                    window.open(label.url_link, '_blank', 'noopener,noreferrer');
                   }
                 }}
                 className={`absolute top-0 bottom-0 left-1/2 flex items-center justify-center transition-all duration-500 ease-in-out ${
-                  isActive ? 'z-30' : 'z-20'
+                  isActive ? 'z-30 cursor-pointer' : 'z-20'
                 } ${!isActive && isDesktop ? 'cursor-pointer' : ''}`}
                 style={{
                   width: `${slideWidth}px`,
@@ -156,29 +158,6 @@ export const HeroBanner = () => {
                   {/* Dark Overlays for Non-active banners on Desktop */}
                   {!isActive && isDesktop && (
                     <div className="absolute inset-0 bg-black/55 hover:bg-black/45 transition-all duration-300 rounded-[8px] md:rounded-[12px]" />
-                  )}
-
-                  {/* Elegant CTA button overlay on Active banner */}
-                  {isActive && label.cta_text && (
-                    <>
-                      {/* Subtle bottom gradient to highlight details/CTA */}
-                      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-                      
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-                        <motion.a
-                          href={label.url_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          whileHover={{ scale: 1.06 }}
-                          whileTap={{ scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-white px-8 py-3 rounded-lg font-bold text-[13px] md:text-[15px] shadow-2xl transition-colors whitespace-nowrap block"
-                          style={{ background: 'var(--primary-blue)' }}
-                        >
-                          {label.cta_text}
-                        </motion.a>
-                      </div>
-                    </>
                   )}
                 </div>
               </div>

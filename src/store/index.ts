@@ -5,6 +5,8 @@ import appReducer from './appSlice';
 import movieReducer from './movieSlice';
 import labelReducer from './labelSlice';
 import eventDetailReducer from './eventDetailSlice';
+import categoryReducer from './categorySlice';
+import adReducer from './adSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
     movies: movieReducer,
     labels: labelReducer,
     eventDetail: eventDetailReducer,
+    categories: categoryReducer,
+    ad: adReducer,
   },
 });
 

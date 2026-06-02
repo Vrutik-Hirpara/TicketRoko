@@ -8,6 +8,7 @@ import type { BookingEvent } from '../types/booking';
 import { createBooking } from '../controllers/bookingController';
 import { savePendingBooking, clearPendingBooking } from '../lib/booking/pendingBooking';
 import { RootState } from '../store';
+import { useDispatch } from 'react-redux';
 
 export interface CheckoutSelection {
   selectedSeats: SeatData[];
@@ -17,7 +18,10 @@ export interface CheckoutSelection {
 
 export function useBookingCheckout(event: BookingEvent, selectedTiming: string | null) {
   const router = useRouter();
-  const { token, isAuthenticated, hydrated } = useSelector((s: RootState) => s.auth);
+  const dispatch = useDispatch();
+  const authState = useSelector((s: RootState) => s.auth);
+  const { isAuthenticated, hydrated } = authState;
+  let { token } = authState;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +63,7 @@ export function useBookingCheckout(event: BookingEvent, selectedTiming: string |
       setError(null);
 
       try {
-        const result = await createBooking(pending, token);
+        const result = await createBooking(pending, token!);
         clearPendingBooking();
         const ref = result.booking_ref ? `&ref=${encodeURIComponent(result.booking_ref)}` : '';
         router.push(`/booking/success?event=${encodeURIComponent(event.slug)}${ref}`);

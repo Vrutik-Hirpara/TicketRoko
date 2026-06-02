@@ -102,3 +102,87 @@ export async function registerUser(credentials: RegisterCredentials): Promise<Au
 
   return parseAuthResponse(result);
 }
+
+export async function refreshAuthToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> {
+  const result = await postJson<AuthApiResult>('/auth/refresh', {
+    refreshToken,
+  });
+
+  const data = result.data || (result as any);
+  if (!data) {
+    throw new Error(result.message || 'Invalid refresh response from server');
+  }
+
+  const newToken = data.accessToken ?? 
+                   data.access_token ?? 
+                   data.token ?? 
+                   (result as any).token ?? 
+                   (result as any).accessToken ?? 
+                   (result as any).access_token;
+
+  const newRefreshToken = data.refreshToken ?? 
+                          data.refresh_token ?? 
+                          (result as any).refreshToken ?? 
+                          (result as any).refresh_token;
+
+  if (!newToken || result.success === false) {
+    throw new Error(result.message || 'Invalid refresh token');
+  }
+
+  if (newRefreshToken) {
+    const { setStoredRefreshToken } = await import('../lib/auth/storage');
+    setStoredRefreshToken(newRefreshToken);
+  }
+
+  return { accessToken: newToken, refreshToken: newRefreshToken };
+}
+
+// ── Google OAuth thunk ────────────────────────────────────────────────────────
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import type { AuthResponse } from '../types/auth';
+
+interface GoogleAuthPayload {
+  /** Raw Google OAuth access token from useGoogleLogin */
+  accessToken: string;
+  /** 'login' tries login first and falls back to register; 'register' is vice-versa */
+  mode?: 'login' | 'register';
+}
+
+async function fetchGoogleProfile(accessToken: string) {
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch Google profile');
+  return res.json() as Promise<{ name: string; email: string; sub: string }>;
+}
+
+function derivePassword(sub: string): string {
+  return `G-${sub.slice(0, 12)}`;
+}
+
+export const googleLoginThunk = createAsyncThunk<AuthResponse, GoogleAuthPayload>(
+  'auth/googleLogin',
+  async ({ accessToken, mode = 'login' }, { rejectWithValue }) => {
+    try {
+      const { name, email, sub } = await fetchGoogleProfile(accessToken);
+      const password = derivePassword(sub);
+
+      if (mode === 'register') {
+        try {
+          return await registerUser({ name, email, password });
+        } catch {
+          return await loginUser({ email, password });
+        }
+      } else {
+        try {
+          return await loginUser({ email, password });
+        } catch {
+          return await registerUser({ name, email, password });
+        }
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Google login failed. Please try again.');
+    }
+  }
+);
+

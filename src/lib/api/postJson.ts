@@ -53,6 +53,12 @@ export async function postJson<TResponse>(
     result = text ? JSON.parse(text) : {};
   } catch {
     if (!response.ok) {
+      if (response.status === 401 && typeof window !== 'undefined') {
+        const { clearStoredAuth } = await import('../auth/storage');
+        clearStoredAuth();
+        window.location.href = '/login';
+        throw new Error('Session expired');
+      }
       throw new Error(`Request failed (${response.status})`);
     }
     throw new Error('Invalid response from server');
@@ -61,6 +67,12 @@ export async function postJson<TResponse>(
   const r = result as { success?: boolean; message?: string; data?: unknown };
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== 'undefined') {
+      const { clearStoredAuth } = await import('../auth/storage');
+      clearStoredAuth();
+      window.location.href = '/login';
+      throw new Error('Session expired');
+    }
     throw new Error(extractErrorMessage(r as ApiErrorBody, `Request failed (${response.status})`));
   }
 

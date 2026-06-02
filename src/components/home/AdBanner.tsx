@@ -1,46 +1,81 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { getFullImageUrl, BASE_URL } from "../../utils/constants";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AppDispatch, RootState } from '../../store';
+import { fetchAdvertisement } from '../../controllers/adController';
+import { nextAd } from '../../store/adSlice';
+import { UPLOADS_URL } from '../../utils/constants';
 
 export const AdBanner = () => {
-  const [adData, setAdData] = useState<any>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { ads, currentIndex, loading } = useSelector((state: RootState) => state.ad);
 
+  // Fetch all ads once
   useEffect(() => {
-    const fetchAd = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/advertisements`);
-        const json = await res.json();
-        if (json.success && json.data) {
-          // If the backend returns an array, pick the first one, else use the object directly
-          const data = Array.isArray(json.data) ? json.data[0] : json.data;
-          setAdData(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch advertisement", error);
-      }
-    };
-    fetchAd();
-  }, []);
+    if (ads.length === 0) dispatch(fetchAdvertisement());
+  }, [dispatch, ads.length]);
 
-  if (!adData) return null;
+  // Auto-rotate every 4 seconds
+  useEffect(() => {
+    if (ads.length <= 1) return;
+    const timer = setInterval(() => {
+      dispatch(nextAd());
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [dispatch, ads.length]);
+
+  if (loading || ads.length === 0) return null;
+
+  const ad = ads[currentIndex];
+  const imgSrc = `${UPLOADS_URL}${ad.image_url}`;
+  const href = ad.thumbnail_url
+    ? `${ad.thumbnail_url}`
+    : ad.url_link || '#';
 
   return (
     <div className="container-max pb-10">
-      <a 
-        href={adData.thumbnail_url ? getFullImageUrl(adData.thumbnail_url) : adData.url_link || "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full relative overflow-hidden rounded-[10px] block cursor-pointer"
-      >
-        {/* Using a standard img tag with w-full ensures it stretches/fits naturally based on aspect ratio like BookMyShow */}
-        <img
-          src={getFullImageUrl(adData.image_url)}
-          alt={adData.title || "Advertisement"}
-          className="w-full h-[97px] object-cover"
-        />
-      </a>
+      <div className="relative w-full rounded-[10px] overflow-hidden h-[97px]">
+        <AnimatePresence mode="wait">
+          <motion.a
+            key={ad.id}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 block cursor-pointer"
+          >
+            <img
+              src={imgSrc}
+              alt={ad.title || 'Advertisement'}
+              className="w-full h-full object-cover"
+            />
+          </motion.a>
+        </AnimatePresence>
+
+        {/* Dot indicators */}
+        {ads.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+            {ads.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  // Jump to specific ad
+                  const times = ((i - currentIndex) + ads.length) % ads.length;
+                  for (let t = 0; t < times; t++) dispatch(nextAd());
+                }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
