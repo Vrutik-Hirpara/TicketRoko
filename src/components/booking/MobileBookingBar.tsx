@@ -23,7 +23,7 @@ export function MobileBookingBar({
     <div
       className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-4 py-3"
       style={{
-        background: 'rgba(17, 24, 39, 0.95)',
+        background: 'var(--booking-surface)',
         borderTop: '1px solid var(--booking-border)',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
       }}

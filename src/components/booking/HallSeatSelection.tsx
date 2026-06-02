@@ -49,11 +49,11 @@ export function HallSeatSelection({
   return (
     <section id="seat-selection" className="container-max pb-28 lg:pb-16 pt-4 sm:pt-6 overflow-x-hidden">
       {/* ── Movie/Event Premium Header Block ── */}
-      <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[rgba(255,255,255,0.08)]">
+      <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[color:var(--booking-border)]">
         <div className="flex items-start gap-3 text-left">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-full transition mt-1 flex items-center justify-center hover:bg-white/10"
+            className="p-2 rounded-full transition mt-1 flex items-center justify-center hover:bg-black/5"
             style={{ background: 'var(--booking-surface-elevated)', color: 'var(--booking-text)' }}
             aria-label="Back"
           >
@@ -66,16 +66,16 @@ export function HallSeatSelection({
             
             {/* Metadata Sub-labels */}
             <div className="flex flex-wrap items-center gap-2 mt-2 text-xs" style={{ color: 'var(--booking-text-muted)' }}>
-              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'var(--booking-surface)', borderColor: 'var(--booking-border)' }}>
                 Movie runtime: 2h 15m
               </span>
-              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'rgba(255, 255, 255, 0.08)', color: 'var(--booking-text)' }}>
+              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'var(--booking-surface)', borderColor: 'var(--booking-border)', color: 'var(--booking-text)' }}>
                 {event.ageRestriction || 'U'}
               </span>
-              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'var(--booking-surface)', borderColor: 'var(--booking-border)' }}>
                 {event.eventType}
               </span>
-              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+              <span className="px-2.5 py-0.5 border rounded-full font-medium" style={{ background: 'var(--booking-surface)', borderColor: 'var(--booking-border)' }}>
                 2D
               </span>
             </div>

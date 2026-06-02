@@ -3,6 +3,7 @@ import React from "react";
 import { HeroBanner } from "../src/components/home/HeroBanner";
 import { TopOffers } from "../src/components/home/TopOffers";
 import { RecommendedMovies } from "../src/components/home/RecommendedMovies";
+import { AdBanner } from "../src/components/home/AdBanner";
 import { TrendingEvents } from "../src/components/home/TrendingEvents";
 import { ClubBanner } from "../src/components/home/ClubBanner";
 import { ExploreMore } from "../src/components/home/ExploreMore";
@@ -14,6 +15,8 @@ export default function Home() {
       <HeroBanner />
 
       <RecommendedMovies />
+
+      <AdBanner />
 
       <TrendingEvents />
       <div className="pt-10">
