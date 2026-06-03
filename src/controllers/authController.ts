@@ -139,7 +139,6 @@ export async function refreshAuthToken(refreshToken: string): Promise<{ accessTo
 
 // ── Google OAuth thunk ────────────────────────────────────────────────────────
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { AuthResponse } from '../types/auth';
 
 interface GoogleAuthPayload {
   /** Raw Google OAuth access token from useGoogleLogin */
