@@ -69,7 +69,7 @@ export const BrowseCategories = () => {
                         )}
                       </motion.div>
 
-                      <h3 className="text-[17px] font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-[17px] font-bold text-center text-gray-800 group-hover:text-blue-600 transition-colors">
                         {cat.name}
                       </h3>
                     </div>

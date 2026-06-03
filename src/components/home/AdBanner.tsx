@@ -29,11 +29,13 @@ export const AdBanner = () => {
   if (loading || ads.length === 0) return null;
 
   const ad = ads[currentIndex];
-  const imgSrc = `${UPLOADS_URL}${ad.image_url}`;
+  const imgSrc = `${UPLOADS_URL}/${ad.image_url}`;
   const href = ad.thumbnail_url
     ? `${ad.thumbnail_url}`
     : ad.url_link || '#';
-
+console.log("UPLOADS_URL:", UPLOADS_URL);
+console.log("image_url:", ad.image_url);
+console.log("Final URL:", imgSrc);
   return (
     <div className="container-max pb-10">
       <div className="relative w-full rounded-[10px] overflow-hidden h-[97px]">
