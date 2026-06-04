@@ -202,6 +202,7 @@ export default function CategorySlugPage() {
         if (selectedPrices.includes('Free') && (price === 0 || event.is_free)) return true;
         if (selectedPrices.includes('₹0 – ₹500') && price >= 0 && price <= 500) return true;
         if (selectedPrices.includes('₹501 – ₹2000') && price >= 501 && price <= 2000) return true;
+    if (selectedPrices.includes('₹2000+') && price > 2000) return true;
 
         return false;
       });
@@ -360,7 +361,7 @@ export default function CategorySlugPage() {
             onClear={() => setSelectedPrices([])}
           >
             <div className="flex flex-col gap-2">
-              {['Free', '₹0 – ₹500', '₹501 – ₹2000'].map(label => (
+              {['Free', '₹0 – ₹500', '₹501 – ₹2000','₹2000+'].map(label => (
                 <CheckLabel 
                   key={label} 
                   label={label} 
