@@ -57,17 +57,17 @@ export const MovieCard = ({
   return (
     <motion.div
       onClick={handleClick}
-      className="w-[207px] cursor-pointer bg-transparent border-0 outline-none select-none flex flex-col group"
+      className="w-full cursor-pointer bg-transparent border-0 outline-none select-none flex flex-col group"
     >
-      {/* IMAGE CONTAINER (207x352 px) */}
-      <div className="relative w-[207px] h-[352px] rounded-[8px] md:rounded-[10px] overflow-hidden shadow-md bg-gray-950">
+      {/* IMAGE CONTAINER */}
+      <div className="relative w-full aspect-[207/352] rounded-[8px] md:rounded-[10px] overflow-hidden shadow-md bg-gray-950">
         <Image
           src={getFullImageUrl(imageUrl)}
           alt={title}
           fill
-          sizes="207px"
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           priority
-          className="object-cover object-center"
+          className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
         />
         {formattedDate && (
           <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white text-[13px] font-medium px-2 py-1.5 flex items-center justify-center gap-1.5">

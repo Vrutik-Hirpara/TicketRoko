@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchRecommendedMovies, fetchPaginatedEvents, fetchTrendingEvents } from '../controllers/eventController';
+import {
+  fetchRecommendedMovies,
+  fetchPaginatedEvents,
+  fetchTrendingEvents,
+  fetchFilteredPaginatedEvents,
+} from '../controllers/eventController';
 
 /**
  * MODEL: Defines the EventData shape and Redux state for movies/events.
@@ -114,6 +119,21 @@ const movieSlice = createSlice({
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchPaginatedEvents.rejected, (state, action) => {
+        state.allEventsLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // fetchFilteredPaginatedEvents (events listing filters)
+      .addCase(fetchFilteredPaginatedEvents.pending, (state) => {
+        state.allEventsLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchFilteredPaginatedEvents.fulfilled, (state, action) => {
+        state.allEventsLoading = false;
+        state.allEvents = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchFilteredPaginatedEvents.rejected, (state, action) => {
         state.allEventsLoading = false;
         state.error = action.payload as string;
       })

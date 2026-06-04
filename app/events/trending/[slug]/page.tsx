@@ -322,8 +322,8 @@ export default function TrendingEventDetailPage() {
                 <InfoRow icon={<MapPin className="w-4 h-4" />} label="City" value={event.city || '—'} />
                 <InfoRow icon={<Tag className="w-4 h-4" />} label="Language" value={event.language || '—'} />
                 <InfoRow icon={<Tag className="w-4 h-4" />} label="Category" value={event.event_type || '—'} />
-                <InfoRow icon={<Ticket className="w-4 h-4" />} label="Total Tickets" value={event.total_tickets?.toLocaleString('en-IN') || '—'} />
-                <InfoRow icon={<Users className="w-4 h-4" />} label="Available" value={availableTickets.toLocaleString('en-IN')} highlight={availableTickets < 50} />
+                {/* <InfoRow icon={<Ticket className="w-4 h-4" />} label="Total Tickets" value={event.total_tickets?.toLocaleString('en-IN') || '—'} />
+                <InfoRow icon={<Users className="w-4 h-4" />} label="Available" value={availableTickets.toLocaleString('en-IN')} highlight={availableTickets < 50} /> */}
               </div>
             </motion.div>
 
@@ -358,7 +358,7 @@ export default function TrendingEventDetailPage() {
                 {!event.is_free && <span className="text-[13px]" style={{ color: 'var(--gray-400)' }}>per ticket</span>}
               </div>
 
-              <div>
+              {/* <div>
                 <div className="flex justify-between text-[12px] mb-1.5" style={{ color: 'var(--gray-500)' }}>
                   <span>{event.sold_tickets} sold</span>
                   <span>{availableTickets} left</span>
@@ -367,7 +367,7 @@ export default function TrendingEventDetailPage() {
                   <div className="h-full rounded-full animate-pulse"
                     style={{ width: `${soldPct}%`, background: availableTickets < 100 ? '#EF4444' : 'var(--primary-blue)' }} />
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-wrap gap-2">
                 <Pill label={formatDate(event.event_date)} icon={<Calendar className="w-3 h-3" />} />

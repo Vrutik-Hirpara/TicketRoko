@@ -7,6 +7,7 @@ import labelReducer from './labelSlice';
 import eventDetailReducer from './eventDetailSlice';
 import categoryReducer from './categorySlice';
 import adReducer from './adSlice';
+import profileReducer from './profileSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     eventDetail: eventDetailReducer,
     categories: categoryReducer,
     ad: adReducer,
+    profile: profileReducer,
   },
 });
 

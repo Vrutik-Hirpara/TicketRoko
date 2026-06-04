@@ -65,6 +65,60 @@ export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPag
   }
 );
 
+interface FilteredEventsParams extends FetchPaginatedParams {
+  startDate?: string | null;
+  endDate?: string | null;
+  minPrice?: number | string | null;
+  maxPrice?: number | string | null;
+}
+
+function buildQuery(params: Record<string, string | number | null | undefined>) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '') return;
+    search.append(k, String(v));
+  });
+  const s = search.toString();
+  return s ? `?${s}` : '';
+}
+
+// Events listing page — fetch filtered with pagination
+export const fetchFilteredPaginatedEvents = createAsyncThunk<
+  PaginatedResponse,
+  FilteredEventsParams
+>(
+  'movies/fetchFilteredPaginated',
+  async ({ page, limit, startDate, endDate, minPrice, maxPrice }, { rejectWithValue }) => {
+    try {
+      const qs = buildQuery({
+        page,
+        limit,
+        startDate,
+        endDate,
+        minPrice,
+        maxPrice,
+      });
+      const response = await fetch(`${BASE_URL}/events${qs}`);
+      if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        return {
+          data: result.data as EventData[],
+          pagination: result.pagination ?? {
+            total: result.data.length,
+            page,
+            limit,
+            totalPages: 1,
+          },
+        };
+      }
+      return rejectWithValue('Unexpected response format');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Network error fetching filtered events');
+    }
+  }
+);
+
 /** Resolve numeric event id from slug (booking-layout uses id, not slug) */
 async function resolveEventId(slugOrId: string): Promise<string> {
   if (/^\d+$/.test(slugOrId)) return slugOrId;

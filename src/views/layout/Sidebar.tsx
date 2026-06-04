@@ -37,10 +37,10 @@ export const Sidebar = () => {
 
   const menuItems = [
     { 
-      label: 'My Orders', 
+      label: 'My Booking', 
       sublabel: 'View all your bookings & purchases', 
       icon: Ticket, 
-      href: '/profile/orders' 
+      href: '/bookings/my-bookings' 
     },
     { 
       label: 'Past Events', 
@@ -52,7 +52,7 @@ export const Sidebar = () => {
       label: 'Upcoming Events', 
       sublabel: 'Your upcoming booked experiences', 
       icon: Calendar, 
-      href: '/profile/upcoming' 
+      href: '/profile/upcoming-events' 
     },
     { 
       label: 'Help & Support', 

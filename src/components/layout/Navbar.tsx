@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { Search, MapPin, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, MapPin, ChevronDown, ArrowRight, LogOut, Menu, X, ChevronRight, Ticket, History, CalendarDays, HelpCircle, Settings, Handshake, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RootState } from '../../store';
 import { logout as logoutAction } from '../../store/authSlice';
 
@@ -14,14 +14,17 @@ export const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const handleLogout = () => {
     dispatch(logoutAction());
+    setIsSidebarOpen(false);
     window.location.href = '/login';
   };
 
   return (
-    <nav className="w-full h-[72px] bg-white border-b border-gray-100 sticky top-0 z-50">
+    <>
+    <nav className="w-full h-[72px] bg-white border-b border-gray-100 sticky top-0 z-40">
       <div className="container-max h-full flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
@@ -72,15 +75,12 @@ export const Navbar = () => {
                   </span>
                 </div>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleLogout}
-                className="flex items-center gap-1.5 text-gray-500 hover:text-red-600 px-3.5 py-2 rounded-full text-sm font-medium transition-colors hover:bg-red-50"
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors ml-2"
               >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden md:inline">Logout</span>
-              </motion.button>
+                <Menu className="h-6 w-6 text-gray-700" />
+              </button>
             </div>
           ) : (
             <Link href="/login">
@@ -97,6 +97,139 @@ export const Navbar = () => {
         </div>
       </div>
     </nav>
+
+    {/* Sidebar Overlay */}
+    <AnimatePresence>
+      {isSidebarOpen && (
+        <>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-[60]"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+
+          {/* Sidebar Panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.3 }}
+            className="fixed top-0 right-0 h-full w-[360px] max-w-full bg-white z-[70] shadow-2xl flex flex-col overflow-y-auto"
+          >
+            {/* Header */}
+            <div className="p-5 flex justify-between items-start">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Hey! {user?.name || 'User'}</h2>
+                <Link href="/profile/edit" onClick={() => setIsSidebarOpen(false)} className="text-gray-500 text-sm flex items-center mt-1 hover:underline">
+                  Edit Profile <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                </Link>
+              </div>
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Info Banner */}
+            <div className="mx-5 mb-5 p-4 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-between cursor-pointer group">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-800">Get tickets on Whatsapp/SMS!</h3>
+                  <p className="text-[13px] text-orange-600 mt-0.5">Add your Mobile Number</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 transition-colors" />
+            </div>
+
+            {/* Menu Items */}
+            <div className="flex-1 flex flex-col">
+              <Link href="/bookings/my-bookings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <Ticket className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">My Booking</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">View all your bookings & purchases</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+
+              <Link href="/profile/past-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">Past Events</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">View events you have attended</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+
+              <Link href="/profile/upcoming-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <CalendarDays className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">Upcoming Events</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">Your upcoming booked experiences</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+              
+              <Link href="/support" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <HelpCircle className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">Help & Support</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">View commonly asked queries and Chat</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+              
+              <Link href="/settings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">Accounts & Settings</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">Location, Payments, Permissions & More</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+
+              <Link href="/partner" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <Handshake className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-800">Partner With Us</h3>
+                    <p className="text-[12px] text-gray-400 mt-0.5">List your event or collaborate with us</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </Link>
+            </div>
+
+            {/* Sign out button */}
+            <div className="p-6 mt-auto border-t border-gray-100">
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#2563EB] text-[#2563EB] rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 

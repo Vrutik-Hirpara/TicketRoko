@@ -40,42 +40,56 @@ export const BrowseCategories = () => {
         >
           {categoriesLoading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="rounded-xl bg-gray-100 animate-pulse h-[140px]" />
-              ))
+              <div key={i} className="rounded-xl bg-gray-100 animate-pulse h-[140px]" />
+            ))
             : categories.map((cat) => (
-                <motion.div
-                  key={cat.slug}
-                  initial="initial"
-                  whileHover="hover"
-                  className="group cursor-pointer"
-                >
-                  <Link href={`/category/${cat.slug}`}>
-                    <div
-                      className="rounded-xl border border-transparent hover:border-gray-200 shadow-sm hover:shadow-md transition-all duration-500 py-4 flex flex-col items-center justify-center"
-                      style={{ backgroundColor: lighten(cat.color, 0.85) }}
+              <motion.div
+                key={cat.slug}
+                initial="initial"
+                whileHover="hover"
+                className="group cursor-pointer"
+              >
+                <Link href={`/category/${cat.slug}`}>
+                  <div
+                    className="rounded-xl border border-transparent hover:border-gray-200 shadow-sm hover:shadow-md transition-all duration-500 py-4 flex flex-col items-center justify-center"
+                    style={{ backgroundColor: lighten(cat.color, 0.85) }}
+                  >
+                    <motion.div
+                      className="w-20 h-20 rounded-full mb-4 flex items-center justify-center shadow-inner"
+                      style={{ backgroundColor: lighten(cat.color, 0.75) }}
                     >
-                      <motion.div
-                        className="w-20 h-20 rounded-full mb-4 flex items-center justify-center shadow-inner"
-                        style={{ backgroundColor: lighten(cat.color, 0.75) }}
-                      >
-                        {cat.icon ? (
-                          <div className="relative w-10 h-10">
-                            <Image src={cat.icon} alt={cat.name} fill className="object-contain" unoptimized />
-                          </div>
-                        ) : (
-                          <span className="text-2xl font-bold" style={{ color: cat.color }}>
-                            {cat.name.charAt(0)}
-                          </span>
-                        )}
-                      </motion.div>
+                      {cat.icon ? (
+                        <div className="relative w-10 h-10">
+                          <Image src={cat.icon} alt={cat.name} fill className="object-contain" unoptimized />
+                        </div>
+                      ) : (
+                        <span className="text-2xl font-bold" style={{ color: cat.color }}>
+                          {cat.name.charAt(0)}
+                        </span>
+                      )}
+                    </motion.div>
 
-                      <h3 className="text-[17px] font-bold text-center text-gray-800 group-hover:text-blue-600 transition-colors">
-                        {cat.name}
-                      </h3>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
+                    <h3
+                      className="
+    text-[17px]
+    font-bold
+    text-center
+    text-gray-800
+    group-hover:text-blue-600
+    transition-colors
+    line-clamp-2
+    h-[52px]
+    flex
+    items-center
+    justify-center
+  "
+                    >
+                      {cat.name}
+                    </h3>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
         </motion.div>
       </div>
     </section>

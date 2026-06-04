@@ -26,6 +26,10 @@ export default function EventsPage() {
     dispatch(fetchPaginatedEvents({ page, limit }));
   }, [dispatch, page, limit]);
 
+
+
+
+
   const handlePrevPage = () => {
     if (page > 1) { 
       setPage(page - 1); 
@@ -66,7 +70,9 @@ export default function EventsPage() {
           className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 gap-4"
           style={{ borderBottom: '1px solid var(--gray-200)' }}
         >
-          <SectionHeader title="All Events" />
+        <SectionHeader title="All Events" />
+
+
           {pagination && (
             <div
               className="flex items-center gap-2 px-4 py-2 rounded-2xl self-start sm:self-auto"

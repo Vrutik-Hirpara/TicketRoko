@@ -6,9 +6,9 @@ import { EventData } from '../store/movieSlice';
 // Fetch all active categories
 export const fetchCategories = createAsyncThunk<CategoryData[], void>(
   'categories/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, signal }) => {
     try {
-      const res = await fetch(`${BASE_URL}/categories/`);
+      const res = await fetch(`${BASE_URL}/categories/`, { signal });
       if (!res.ok) return rejectWithValue(`HTTP error: ${res.status}`);
       const json = await res.json();
       const items = json?.data ?? json;
@@ -35,9 +35,9 @@ export const fetchEventsByCategory = createAsyncThunk<
   string
 >(
   'categories/fetchEventsBySlug',
-  async (slug, { rejectWithValue }) => {
+  async (slug, { rejectWithValue, signal }) => {
     try {
-      const res = await fetch(`${BASE_URL}/events/category/${slug}`);
+      const res = await fetch(`${BASE_URL}/events/category/${slug}`, { signal });
       if (!res.ok) return rejectWithValue(`HTTP error: ${res.status}`);
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
