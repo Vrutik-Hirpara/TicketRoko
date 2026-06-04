@@ -70,7 +70,7 @@ import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppDispatch, RootState } from '../../../src/store';
 import { fetchCategories, fetchEventsByCategory } from '../../../src/controllers/categoryController';
-import { clearCategoryEvents } from '../../../src/store/categorySlice';
+import { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices } from '../../../src/store/categorySlice';
 import { MovieCard } from '../../../src/components/ui/MovieCard';
 import { SectionHeader } from '../../../src/components/ui/SectionHeader';
 import { CustomDateRangePicker } from '../../../src/components/ui/CustomDateRangePicker';
@@ -80,7 +80,7 @@ export default function CategorySlugPage() {
   const slug = params?.slug as string;
   const dispatch = useDispatch<AppDispatch>();
 
-  const { categories, categoriesLoading, categoryEvents, categoryEventsLoading, categoryEventsError } =
+  const { categories, categoriesLoading, categoryEvents, categoryEventsLoading, categoryEventsError, selectedDates, dateRange, selectedPrices } =
     useSelector((state: RootState) => state.categories);
 
   // Fetch categories if not already loaded
@@ -115,16 +115,21 @@ export default function CategorySlugPage() {
     setExpandedFilters((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const [selectedDates, setSelectedDates] = React.useState<string[]>([]);
-  const [dateRange, setDateRange] = React.useState<{ start: string; end: string }>({ start: '', end: '' });
   const [showDateRange, setShowDateRange] = React.useState(false);
   const [showDatePickerModal, setShowDatePickerModal] = React.useState(false);
-  const [selectedPrices, setSelectedPrices] = React.useState<string[]>([]);
 
-  const toggleFilterArray = (setFilter: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
-    setFilter((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
+  const toggleDateFilter = (value: string) => {
+    const newDates = selectedDates.includes(value) 
+      ? selectedDates.filter(v => v !== value) 
+      : [...selectedDates, value];
+    dispatch(setSelectedDates(newDates));
+  };
+
+  const togglePriceFilter = (value: string) => {
+    const newPrices = selectedPrices.includes(value) 
+      ? selectedPrices.filter(v => v !== value) 
+      : [...selectedPrices, value];
+    dispatch(setSelectedPrices(newPrices));
   };
 
   const isToday = (date: Date, today: Date) => {
@@ -252,8 +257,8 @@ export default function CategorySlugPage() {
             onToggle={() => toggleFilterSection('Date')}
             showClear={selectedDates.length > 0 || !!dateRange.start || !!dateRange.end}
             onClear={() => {
-              setSelectedDates([]);
-              setDateRange({ start: '', end: '' });
+              dispatch(setSelectedDates([]));
+              dispatch(setDateRange({ start: '', end: '' }));
             }}
           >
             <div className="flex flex-col gap-4">
@@ -264,7 +269,7 @@ export default function CategorySlugPage() {
                   return (
                     <button
                       key={label}
-                      onClick={() => toggleFilterArray(setSelectedDates, label)}
+                      onClick={() => toggleDateFilter(label)}
                       className={`px-3 py-1.5 text-[12px] rounded border transition-colors ${
                         isActive 
                           ? 'border-[var(--primary-blue)] text-white bg-[var(--primary-blue)]' 
@@ -287,7 +292,7 @@ export default function CategorySlugPage() {
                     if (isActive) {
                       setShowDateRange(false);
                       setShowDatePickerModal(false);
-                      setDateRange({ start: '', end: '' });
+                      dispatch(setDateRange({ start: '', end: '' }));
                     } else {
                       setShowDateRange(true);
                       setShowDatePickerModal(true);
@@ -318,7 +323,7 @@ export default function CategorySlugPage() {
                         initialStart={dateRange.start}
                         initialEnd={dateRange.end}
                         onApply={(start, end) => {
-                          setDateRange({ start, end });
+                          dispatch(setDateRange({ start, end }));
                           setShowDatePickerModal(false);
                         }}
                         onCancel={() => setShowDatePickerModal(false)}
@@ -358,7 +363,7 @@ export default function CategorySlugPage() {
             expanded={expandedFilters['Price']} 
             onToggle={() => toggleFilterSection('Price')}
             showClear={selectedPrices.length > 0}
-            onClear={() => setSelectedPrices([])}
+            onClear={() => dispatch(setSelectedPrices([]))}
           >
             <div className="flex flex-col gap-2">
               {['Free', '₹0 – ₹500', '₹501 – ₹2000','₹2000+'].map(label => (
@@ -366,7 +371,7 @@ export default function CategorySlugPage() {
                   key={label} 
                   label={label} 
                   checked={selectedPrices.includes(label)}
-                  onChange={() => toggleFilterArray(setSelectedPrices, label)}
+                  onChange={() => togglePriceFilter(label)}
                 />
               ))}
             </div>

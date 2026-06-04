@@ -20,6 +20,10 @@ interface CategoryState {
   categoryEventsLoading: boolean;
   categoryEventsError: string | null;
   activeSlug: string | null;
+
+  selectedDates: string[];
+  dateRange: { start: string; end: string };
+  selectedPrices: string[];
 }
 
 const initialState: CategoryState = {
@@ -31,6 +35,10 @@ const initialState: CategoryState = {
   categoryEventsLoading: false,
   categoryEventsError: null,
   activeSlug: null,
+
+  selectedDates: [],
+  dateRange: { start: '', end: '' },
+  selectedPrices: [],
 };
 
 const categorySlice = createSlice({
@@ -41,6 +49,15 @@ const categorySlice = createSlice({
       state.categoryEvents = [];
       state.categoryEventsError = null;
       state.activeSlug = null;
+    },
+    setSelectedDates: (state, action: PayloadAction<string[]>) => {
+      state.selectedDates = action.payload;
+    },
+    setDateRange: (state, action: PayloadAction<{ start: string; end: string }>) => {
+      state.dateRange = action.payload;
+    },
+    setSelectedPrices: (state, action: PayloadAction<string[]>) => {
+      state.selectedPrices = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -76,5 +93,5 @@ const categorySlice = createSlice({
   },
 });
 
-export const { clearCategoryEvents } = categorySlice.actions;
+export const { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices } = categorySlice.actions;
 export default categorySlice.reducer;
