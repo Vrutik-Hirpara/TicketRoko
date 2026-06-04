@@ -5,6 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Search, MapPin, Menu, X, ChevronRight, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch } from 'react-redux';
+import { setModal } from '../../store/uiSlice';
+import type { AppDispatch } from '../../store';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -12,6 +15,7 @@ import { Typography } from '../ui/Typography';
 import { useNavbar } from '../../controllers/useNavbar';
 
 export const Navbar = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { 
     location, 
     searchQuery, 
@@ -129,7 +133,7 @@ export const Navbar = () => {
       </button>
     </div>
   ) : (
-    <Link href="/login">
+    <button onClick={() => dispatch(setModal({ isOpen: true, type: 'login' }))}>
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -138,7 +142,7 @@ export const Navbar = () => {
         <span>Login</span>
         <ArrowRight className="h-4 w-4" />
       </motion.button>
-    </Link>
+    </button>
   )}
 </div>
         {/* Mobile Menu Toggle */}

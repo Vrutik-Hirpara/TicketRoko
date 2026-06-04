@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { RootState } from '../../store';
-import { toggleSidebar } from '../../store/uiSlice';
+import { toggleSidebar, setModal } from '../../store/uiSlice';
 import { logout } from '../../store/authSlice';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -148,8 +148,16 @@ export const Sidebar = () => {
                 return (
                   <Link 
                     key={index} 
-                    href={hydrated && isAuthenticated ? item.href : '/login'} 
-                    onClick={() => dispatch(toggleSidebar())}
+                    href={hydrated && isAuthenticated ? item.href : '#'} 
+                    onClick={(e) => {
+                      if (!hydrated || !isAuthenticated) {
+                        e.preventDefault();
+                        dispatch(setModal({ isOpen: true, type: 'login' }));
+                        dispatch(toggleSidebar());
+                      } else {
+                        dispatch(toggleSidebar());
+                      }
+                    }}
                     className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 group"
                   >
                     <Icon className="w-5 h-5 text-gray-500 group-hover:text-primary-blue transition-colors" />
@@ -188,22 +196,24 @@ export const Sidebar = () => {
                   Sign out
                 </button>
               ) : (
-                <Link href="/login" onClick={() => dispatch(toggleSidebar())}>
-                  <button
-                    className="w-full py-3 rounded-xl font-bold text-base text-white transition-all duration-200 flex items-center justify-center gap-2"
-                    style={{
-                      backgroundColor: 'var(--primary-blue)',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue-hover)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue)';
-                    }}
-                  >
-                    Sign in
-                  </button>
-                </Link>
+                <button
+                  onClick={() => {
+                    dispatch(toggleSidebar());
+                    dispatch(setModal({ isOpen: true, type: 'login' }));
+                  }}
+                  className="w-full py-3 rounded-xl font-bold text-base text-white transition-all duration-200 flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: 'var(--primary-blue)',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--primary-blue)';
+                  }}
+                >
+                  Sign in
+                </button>
               )}
             </div>
           </motion.div>

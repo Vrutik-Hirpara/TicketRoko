@@ -7,6 +7,7 @@ import { Sidebar } from "../src/views/layout/Sidebar";
 import { CategoryNav } from "../src/components/layout/CategoryNav";
 import { Footer } from "../src/components/layout/Footer";
 import { ScrollToTop } from "../src/components/layout/ScrollToTop";
+import { LoginModal } from "../src/components/auth/LoginModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </div>
+          <LoginModal />
         </Providers>
       </body>
     </html>
