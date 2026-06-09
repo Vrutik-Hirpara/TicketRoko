@@ -18,10 +18,11 @@ export default function TrendingEventsPage() {
   const { trending, trendingLoading, trendingError } = useSelector(
     (state: RootState) => state.movies
   );
+  const { location } = useSelector((state: RootState) => state.app);
 
   useEffect(() => {
     dispatch(fetchTrendingEvents());
-  }, [dispatch]);
+  }, [dispatch, location]);
 
   const SkeletonCard = () => (
     <div className="flex-shrink-0 w-[207px] animate-pulse">

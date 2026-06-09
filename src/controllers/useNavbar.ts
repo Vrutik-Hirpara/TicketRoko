@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { setLocation, setSearchQuery } from '../store/appSlice';
+import { setLocation, setSearchQuery, City } from '../store/appSlice';
 import { toggleSidebar } from '../store/uiSlice';
 import { logout } from '../store/authSlice';
 
@@ -19,9 +19,10 @@ export const useNavbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLocationChange = (loc: string) => {
+  const handleLocationChange = (loc: City) => {
     dispatch(setLocation(loc));
   };
+
 
   const handleSearch = (query: string) => {
     dispatch(setSearchQuery(query));

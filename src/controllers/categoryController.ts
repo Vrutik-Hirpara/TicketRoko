@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BASE_URL } from '../utils/constants';
 import { CategoryData } from '../store/categorySlice';
 import { EventData } from '../store/movieSlice';
+import { RootState } from '../store';
 
 // Fetch all active categories
 export const fetchCategories = createAsyncThunk<CategoryData[], void>(
@@ -32,12 +33,18 @@ export const fetchCategories = createAsyncThunk<CategoryData[], void>(
 // Fetch events for a specific category slug
 export const fetchEventsByCategory = createAsyncThunk<
   { events: EventData[]; slug: string },
-  string
+  string,
+  { state: RootState }
 >(
   'categories/fetchEventsBySlug',
-  async (slug, { rejectWithValue, signal }) => {
+  async (slug, { getState, rejectWithValue, signal }) => {
     try {
-      const res = await fetch(`${BASE_URL}/events/category/${slug}`, { signal });
+      const state = getState();
+      const citySlug = state.app.location?.slug;
+      const endpoint = citySlug 
+        ? `${BASE_URL}/events/category/${slug}?city=${citySlug}` 
+        : `${BASE_URL}/events/category/${slug}`;
+      const res = await fetch(endpoint, { signal });
       if (!res.ok) return rejectWithValue(`HTTP error: ${res.status}`);
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {

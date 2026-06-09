@@ -88,7 +88,9 @@ export default function CategorySlugPage() {
     if (categories.length === 0) dispatch(fetchCategories());
   }, [dispatch, categories.length]);
 
-  // Fetch events whenever slug changes — cleanup resets state on slug change / unmount
+  const { location } = useSelector((state: RootState) => state.app);
+
+  // Fetch events whenever slug or location changes — cleanup resets state on slug change / unmount
   useEffect(() => {
     let promise: any;
     if (slug) {
@@ -98,7 +100,7 @@ export default function CategorySlugPage() {
       if (promise) promise.abort();
       dispatch(clearCategoryEvents());
     };
-  }, [slug, dispatch]);
+  }, [slug, location, dispatch]);
 
   const activeCategory = categories.find((c) => c.slug === slug);
 

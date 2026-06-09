@@ -21,11 +21,13 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ categoryType, title 
   const { allEvents, allEventsLoading, error } = useSelector(
     (state: RootState) => state.movies
   );
+  const { location } = useSelector((state: RootState) => state.app);
 
-  // Fetch a reasonable batch of events to filter locally
+  // Re-fetch whenever selected city changes
+  const citySlug = location?.slug;
   useEffect(() => {
     dispatch(fetchPaginatedEvents({ page: 1, limit: 100 }));
-  }, [dispatch]);
+  }, [dispatch, citySlug]);
 
   // Filter events matching the given category (case-insensitive)
   const filteredEvents = useMemo(() => {

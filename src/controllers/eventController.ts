@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { EventData } from '../store/movieSlice';
 import type { EventBookingPayload } from '../types/booking';
 import { BASE_URL } from '../utils/constants';
+import { RootState } from '../store';
 
 /**
  * CONTROLLER: Handles all event-related API calls.
@@ -9,11 +10,14 @@ import { BASE_URL } from '../utils/constants';
  */
 
 // Home section — fetch all recommended events (no pagination)
-export const fetchRecommendedMovies = createAsyncThunk<EventData[], void>(
+export const fetchRecommendedMovies = createAsyncThunk<EventData[], void, { state: RootState }>(
   'movies/fetchRecommended',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/events/`);
+      const state = getState();
+      const citySlug = state.app.location?.slug;
+      const endpoint = citySlug ? `${BASE_URL}/events/city/${citySlug}` : `${BASE_URL}/events/`;
+      const response = await fetch(endpoint);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.success && result.data) return result.data as EventData[];
@@ -40,11 +44,17 @@ interface PaginatedResponse {
   };
 }
 
-export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPaginatedParams>(
+export const fetchPaginatedEvents = createAsyncThunk<PaginatedResponse, FetchPaginatedParams, { state: RootState }>(
   'movies/fetchPaginated',
-  async ({ page, limit }, { rejectWithValue }) => {
+  async ({ page, limit }, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/events?page=${page}&limit=${limit}`);
+      const state = getState();
+      const citySlug = state.app.location?.slug;
+      const endpoint = citySlug
+        ? `${BASE_URL}/events/city/${citySlug}?page=${page}&limit=${limit}`
+        : `${BASE_URL}/events?page=${page}&limit=${limit}`;
+
+      const response = await fetch(endpoint);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.success && result.data) {
@@ -85,11 +95,15 @@ function buildQuery(params: Record<string, string | number | null | undefined>) 
 // Events listing page — fetch filtered with pagination
 export const fetchFilteredPaginatedEvents = createAsyncThunk<
   PaginatedResponse,
-  FilteredEventsParams
+  FilteredEventsParams,
+  { state: RootState }
 >(
   'movies/fetchFilteredPaginated',
-  async ({ page, limit, startDate, endDate, minPrice, maxPrice }, { rejectWithValue }) => {
+  async ({ page, limit, startDate, endDate, minPrice, maxPrice }, { getState, rejectWithValue }) => {
     try {
+      const state = getState();
+      const citySlug = state.app.location?.slug;
+
       const qs = buildQuery({
         page,
         limit,
@@ -98,7 +112,10 @@ export const fetchFilteredPaginatedEvents = createAsyncThunk<
         minPrice,
         maxPrice,
       });
-      const response = await fetch(`${BASE_URL}/events${qs}`);
+      const endpoint = citySlug 
+        ? `${BASE_URL}/events/city/${citySlug}${qs}` 
+        : `${BASE_URL}/events${qs}`;
+      const response = await fetch(endpoint);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.success && result.data) {
@@ -175,14 +192,25 @@ export const fetchEventBySlug = createAsyncThunk<EventData, string>(
 );
 
 // Trending section — fetch trending events from /events/trending
-export const fetchTrendingEvents = createAsyncThunk<EventData[], void>(
+export const fetchTrendingEvents = createAsyncThunk<EventData[], void, { state: RootState }>(
   'movies/fetchTrending',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
+      const state = getState();
+      const citySlug = state.app.location?.slug;
+      
       const response = await fetch(`${BASE_URL}/events/trending`);
       if (!response.ok) return rejectWithValue(`HTTP error: ${response.status}`);
+      
       const result = await response.json();
-      if (result.success && result.data) return result.data as EventData[];
+      if (result.success && result.data) {
+        const allTrending = result.data as EventData[];
+        // Backend doesn't support ?city= for trending, so we filter locally
+        if (citySlug) {
+          return allTrending.filter(event => event.city?.toLowerCase() === citySlug.toLowerCase());
+        }
+        return allTrending;
+      }
       return rejectWithValue('Unexpected response format');
     } catch (error: any) {
       return rejectWithValue(error.message || 'Network error fetching trending events');

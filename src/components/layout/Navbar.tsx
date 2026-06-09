@@ -9,12 +9,33 @@ import { Search, MapPin, ChevronDown, ArrowRight, LogOut, Menu, X, ChevronRight,
 import { motion, AnimatePresence } from 'framer-motion';
 import { RootState } from '../../store';
 import { logout as logoutAction } from '../../store/authSlice';
+import { fetchCities } from '../../controllers/appController';
+import { setLocation, City } from '../../store/appSlice';
 
 export const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
+  const { location, cities } = useSelector((state: RootState) => state.app);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [isCityDropdownOpen, setIsCityDropdownOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (cities.length === 0) {
+      dispatch(fetchCities() as any);
+    }
+  }, [dispatch, cities.length]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCityDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     dispatch(logoutAction());
@@ -53,11 +74,44 @@ export const Navbar = () => {
 
         {/* Location and Login */}
         <div className="flex items-center gap-8">
-          <button className="flex items-center gap-2 text-[#222222] text-sm font-medium hover:text-primary transition-colors">
-            <MapPin className="h-4 w-4" />
-            <span>Ahmedabad</span>
-            <ChevronDown className="h-4 w-4 opacity-40" />
-          </button>
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+              className="flex items-center gap-2 text-[#222222] text-sm font-medium hover:text-primary transition-colors"
+            >
+              <MapPin className="h-4 w-4" />
+              <span className="capitalize">{location?.name || 'Loading...'}</span>
+              <ChevronDown className={`h-4 w-4 opacity-40 transition-transform ${isCityDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isCityDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full left-0 mt-4 w-48 bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 py-2 z-50 overflow-hidden"
+                >
+                  <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Select City
+                  </div>
+                  {cities.map((city) => (
+                    <button
+                      key={city.id}
+                      onClick={() => {
+                        dispatch(setLocation(city));
+                        setIsCityDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${location?.id === city.id ? 'text-primary font-semibold bg-blue-50/50' : 'text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <span className="capitalize">{city.name}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Login / Auth Button */}
           {hydrated && isAuthenticated ? (
@@ -87,8 +141,7 @@ export const Navbar = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-2 bg-[#2563EB] text-white px-7 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-blue-600/20 flex-shrink-0"
-              >
+                className="flex items-center gap-2 bg-[#2563EB] text-white px-7 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-blue-600/20 flex-shrink-0">
                 <span>Login</span>
                 <ArrowRight className="h-4 w-4" />
               </motion.button>

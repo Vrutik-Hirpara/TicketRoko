@@ -21,6 +21,7 @@ export const TrendingEvents = () => {
   const { trending, trendingLoading, trendingError } = useSelector(
     (state: RootState) => state.movies
   );
+  const { location } = useSelector((state: RootState) => state.app);
   const router = useRouter();
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -32,9 +33,10 @@ export const TrendingEvents = () => {
   const [showLeftArrow, setShowLeftArrow] = React.useState(false);
   const [showRightArrow, setShowRightArrow] = React.useState(false);
 
+  const citySlug = location?.slug;
   React.useEffect(() => {
     dispatch(fetchTrendingEvents());
-  }, [dispatch]);
+  }, [dispatch, citySlug]);
 
   const updateArrowVisibility = React.useCallback(() => {
     const el = scrollRef.current;

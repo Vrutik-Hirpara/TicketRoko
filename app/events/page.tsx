@@ -18,13 +18,14 @@ export default function EventsPage() {
   const { allEvents, allEventsLoading, pagination, error } = useSelector(
     (state: RootState) => state.movies
   );
+  const { location } = useSelector((state: RootState) => state.app);
 
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
 
   useEffect(() => {
     dispatch(fetchPaginatedEvents({ page, limit }));
-  }, [dispatch, page, limit]);
+  }, [dispatch, page, limit, location]);
 
 
 
