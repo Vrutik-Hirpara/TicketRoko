@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import type { SeatData } from '../types/booking';
 import { formatCurrency } from '../lib/booking/seatLayout';
 import { getBookableSeats } from '../lib/booking/seatMapper';
@@ -38,6 +38,22 @@ export function useSeatSelection(seats: SeatData[], eventSlug?: string) {
       return next;
     });
   }, []);
+
+  // Deselect seats if they become sold (e.g. from real-time socket updates)
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const id of next) {
+        const seat = seatById.get(id);
+        if (seat && seat.status === 'sold') {
+          next.delete(id);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [seatById]);
 
   const selectedSeats = useMemo(
     () =>

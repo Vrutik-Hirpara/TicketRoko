@@ -97,6 +97,73 @@ export function SeatMap({
     [],
   );
 
+  // Wheel and pinch to zoom
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+        setZoomDelta((d) => {
+          const newDelta = d + delta;
+          return Math.max(ZOOM_MIN - autoScale, Math.min(ZOOM_MAX - autoScale, newDelta));
+        });
+      }
+    };
+
+    let initialDist = 0;
+    let initialDelta = 0;
+
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        initialDist = getDistance(e.touches);
+        setZoomDelta((d) => {
+          initialDelta = d;
+          return d;
+        });
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && initialDist > 0) {
+        e.preventDefault();
+        const dist = getDistance(e.touches);
+        const scaleChange = (dist / initialDist) - 1; // 0 if same, positive if zoomed in
+        
+        setZoomDelta(() => {
+          const newDelta = initialDelta + scaleChange * 1.5; // multiplier for sensitivity
+          return Math.max(ZOOM_MIN - autoScale, Math.min(ZOOM_MAX - autoScale, newDelta));
+        });
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        initialDist = 0;
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    el.addEventListener('touchstart', handleTouchStart, { passive: false });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    el.addEventListener('touchend', handleTouchEnd);
+    
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [autoScale]);
+
   const needsScrollHint = scale < 0.95 || bounds.width > 400;
 
   // Compute fixed tooltip position: centered above the hovered seat button
@@ -182,6 +249,7 @@ export function SeatMap({
           minHeight: 'clamp(240px, 45vh, 400px)',
           border: '1px solid var(--booking-border)',
           background: 'var(--booking-bg)',
+          touchAction: 'pan-x pan-y',
         }}
       >
         <div className="hall-scroll-inner flex min-h-full min-w-full items-start justify-center p-2 sm:p-3">

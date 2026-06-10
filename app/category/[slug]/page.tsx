@@ -70,7 +70,7 @@ import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppDispatch, RootState } from '../../../src/store';
 import { fetchCategories, fetchEventsByCategory } from '../../../src/controllers/categoryController';
-import { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices } from '../../../src/store/categorySlice';
+import { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices, setSelectedLanguages } from '../../../src/store/categorySlice';
 import { MovieCard } from '../../../src/components/ui/MovieCard';
 import { SectionHeader } from '../../../src/components/ui/SectionHeader';
 import { CustomDateRangePicker } from '../../../src/components/ui/CustomDateRangePicker';
@@ -80,7 +80,7 @@ export default function CategorySlugPage() {
   const slug = params?.slug as string;
   const dispatch = useDispatch<AppDispatch>();
 
-  const { categories, categoriesLoading, categoryEvents, categoryEventsLoading, categoryEventsError, selectedDates, dateRange, selectedPrices } =
+  const { categories, categoriesLoading, categoryEvents, categoryEventsLoading, categoryEventsError, selectedDates, dateRange, selectedPrices, selectedLanguages } =
     useSelector((state: RootState) => state.categories);
 
   // Fetch categories if not already loaded
@@ -134,6 +134,13 @@ export default function CategorySlugPage() {
     dispatch(setSelectedPrices(newPrices));
   };
 
+  const toggleLanguageFilter = (value: string) => {
+    const newLanguages = selectedLanguages.includes(value) 
+      ? selectedLanguages.filter(v => v !== value) 
+      : [...selectedLanguages, value];
+    dispatch(setSelectedLanguages(newLanguages));
+  };
+
   const isToday = (date: Date, today: Date) => {
     return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
   };
@@ -160,6 +167,13 @@ export default function CategorySlugPage() {
 
   const filteredEvents = React.useMemo(() => {
     let result = [...categoryEvents];
+
+    // Filter by selected city (backend ignores ?city= param for this endpoint)
+    if (location?.slug) {
+      result = result.filter(event =>
+        event.city?.toLowerCase() === location.slug?.toLowerCase()
+      );
+    }
 
     if (selectedDates.length > 0 || dateRange.start || dateRange.end) {
       const today = new Date();
@@ -215,8 +229,14 @@ export default function CategorySlugPage() {
       });
     }
 
+    if (selectedLanguages.length > 0) {
+      result = result.filter(event => {
+        return event.language && selectedLanguages.includes(event.language);
+      });
+    }
+
     return result;
-  }, [categoryEvents, selectedDates, selectedPrices]);
+  }, [categoryEvents, selectedDates, selectedPrices, selectedLanguages]);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--gray-50)' }}>
@@ -341,11 +361,18 @@ export default function CategorySlugPage() {
             title="Languages" 
             expanded={expandedFilters['Languages']} 
             onToggle={() => toggleFilterSection('Languages')}
+            showClear={selectedLanguages.length > 0}
+            onClear={() => dispatch(setSelectedLanguages([]))}
           >
             <div className="flex flex-col gap-2">
-              <CheckLabel label="English" />
-              <CheckLabel label="Hindi" />
-              <CheckLabel label="Gujarati" />
+              {['English', 'Hindi', 'Gujarati'].map(label => (
+                <CheckLabel 
+                  key={label}
+                  label={label} 
+                  checked={selectedLanguages.includes(label)}
+                  onChange={() => toggleLanguageFilter(label)}
+                />
+              ))}
             </div>
           </FilterSection>
 

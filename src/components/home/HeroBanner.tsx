@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { fetchLabels } from '../../controllers/labelController';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getFullImageUrl } from '../../utils/constants';
 
 export const HeroBanner = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -147,7 +148,7 @@ export const HeroBanner = () => {
                 <div className="relative w-full h-full rounded-[8px] md:rounded-[12px] overflow-hidden shadow-2xl bg-[#1f1f1f] group">
                   {/* Banner Image */}
                   <Image
-                    src={label.image_url}
+                    src={getFullImageUrl(label.image_url)}
                     alt={label.name}
                     fill
                     priority={isActive}

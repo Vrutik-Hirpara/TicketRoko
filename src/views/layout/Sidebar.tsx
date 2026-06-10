@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { RootState } from '../../store';
 import { toggleSidebar, setModal } from '../../store/uiSlice';
 import { logout } from '../../store/authSlice';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HelpSupportModal } from '../../components/ui/HelpSupportModal';
 import { 
   X, 
   ChevronRight, 
@@ -27,6 +28,7 @@ export const Sidebar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const isOpen = useSelector((state: RootState) => state.ui.isSidebarOpen);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
 
   const handleSignOut = () => {
@@ -58,7 +60,7 @@ export const Sidebar = () => {
       label: 'Help & Support', 
       sublabel: 'View commonly asked queries and Chat', 
       icon: HelpCircle, 
-      href: '/help' 
+      href: null 
     },
     { 
       label: 'Accounts & Settings', 
@@ -75,6 +77,7 @@ export const Sidebar = () => {
   ];
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -145,19 +148,29 @@ export const Sidebar = () => {
             <div className="flex-1 overflow-y-auto py-2">
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
+                const isHelp = item.label === 'Help & Support';
+
+                const handleClick = (e: React.MouseEvent) => {
+                  if (!hydrated || !isAuthenticated) {
+                    e.preventDefault();
+                    dispatch(setModal({ isOpen: true, type: 'login' }));
+                    dispatch(toggleSidebar());
+                    return;
+                  }
+                  if (isHelp) {
+                    e.preventDefault();
+                    dispatch(toggleSidebar());
+                    setHelpOpen(true);
+                    return;
+                  }
+                  dispatch(toggleSidebar());
+                };
+
                 return (
-                  <Link 
-                    key={index} 
-                    href={hydrated && isAuthenticated ? item.href : '#'} 
-                    onClick={(e) => {
-                      if (!hydrated || !isAuthenticated) {
-                        e.preventDefault();
-                        dispatch(setModal({ isOpen: true, type: 'login' }));
-                        dispatch(toggleSidebar());
-                      } else {
-                        dispatch(toggleSidebar());
-                      }
-                    }}
+                  <Link
+                    key={index}
+                    href={hydrated && isAuthenticated && item.href ? item.href : '#'}
+                    onClick={handleClick}
                     className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 group"
                   >
                     <Icon className="w-5 h-5 text-gray-500 group-hover:text-primary-blue transition-colors" />
@@ -220,5 +233,9 @@ export const Sidebar = () => {
         </>
       )}
     </AnimatePresence>
+
+    {/* Help & Support Modal — rendered outside sidebar so z-index stacks above */}
+    <HelpSupportModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+    </>
   );
 };

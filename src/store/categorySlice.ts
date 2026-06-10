@@ -24,6 +24,7 @@ interface CategoryState {
   selectedDates: string[];
   dateRange: { start: string; end: string };
   selectedPrices: string[];
+  selectedLanguages: string[];
 }
 
 const initialState: CategoryState = {
@@ -39,6 +40,7 @@ const initialState: CategoryState = {
   selectedDates: [],
   dateRange: { start: '', end: '' },
   selectedPrices: [],
+  selectedLanguages: [],
 };
 
 const categorySlice = createSlice({
@@ -58,6 +60,9 @@ const categorySlice = createSlice({
     },
     setSelectedPrices: (state, action: PayloadAction<string[]>) => {
       state.selectedPrices = action.payload;
+    },
+    setSelectedLanguages: (state, action: PayloadAction<string[]>) => {
+      state.selectedLanguages = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -93,5 +98,5 @@ const categorySlice = createSlice({
   },
 });
 
-export const { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices } = categorySlice.actions;
+export const { clearCategoryEvents, setSelectedDates, setDateRange, setSelectedPrices, setSelectedLanguages } = categorySlice.actions;
 export default categorySlice.reducer;

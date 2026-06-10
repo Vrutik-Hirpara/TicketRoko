@@ -8,7 +8,8 @@ import {
   normalizeApiSeats,
 } from '../lib/booking/seatMapper';
 import type { BookingEvent, EventBookingPayload, SeatData, SectionSummary } from '../types/booking';
-import { getEventBannerUrl } from '../utils/constants';
+import { getEventBannerUrl, UPLOADS_URL } from '../utils/constants';
+import { io } from 'socket.io-client';
 
 interface UseEventBookingResult {
   event: BookingEvent | null;
@@ -63,6 +64,44 @@ export function useEventBooking(slug: string): UseEventBookingResult {
 
     load();
   }, [slug, load, applyPayload]);
+
+  useEffect(() => {
+    const eventId = payload?.event?.id;
+    if (!eventId) return;
+
+    const socket = io(UPLOADS_URL, {
+      transports: ['websocket', 'polling']
+    });
+
+    // Ensure room ID is a string, as socket.io rooms are typically strings
+    const roomId = String(eventId);
+
+    socket.emit('join:event', roomId);
+
+    socket.on('seats:booked', ({ seat_ids }: { seat_ids: any[] }) => {
+      if (!seat_ids || !Array.isArray(seat_ids)) return;
+      
+      const bookedIds = seat_ids.map(Number);
+
+      setPayload((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          seats: prev.seats.map((seat) =>
+            bookedIds.includes(Number(seat.id)) ? { ...seat, status: 'sold' as const } : seat
+          ),
+        };
+      });
+
+      // Refresh full layout to update section summaries and maintain consistency
+      load();
+    });
+
+    return () => {
+      socket.emit('leave:event', roomId);
+      socket.disconnect();
+    };
+  }, [payload?.event?.id, load]);
 
   const event = useMemo(
     () =>

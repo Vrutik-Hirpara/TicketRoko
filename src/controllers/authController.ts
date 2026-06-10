@@ -143,42 +143,19 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 interface GoogleAuthPayload {
   /** Raw Google OAuth access token from useGoogleLogin */
   accessToken: string;
-  /** 'login' tries login first and falls back to register; 'register' is vice-versa */
+  /** kept for backward-compat with GoogleLoginButton props */
   mode?: 'login' | 'register';
-}
-
-async function fetchGoogleProfile(accessToken: string) {
-  const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch Google profile');
-  return res.json() as Promise<{ name: string; email: string; sub: string }>;
-}
-
-function derivePassword(sub: string): string {
-  return `G-${sub.slice(0, 12)}`;
 }
 
 export const googleLoginThunk = createAsyncThunk<AuthResponse, GoogleAuthPayload>(
   'auth/googleLogin',
-  async ({ accessToken, mode = 'login' }, { rejectWithValue }) => {
+  async ({ accessToken }, { rejectWithValue }) => {
     try {
-      const { name, email, sub } = await fetchGoogleProfile(accessToken);
-      const password = derivePassword(sub);
+      const result = await postJson<AuthApiResult>('/auth/google-login', {
+        token: accessToken,
+      });
 
-      if (mode === 'register') {
-        try {
-          return await registerUser({ name, email, password });
-        } catch {
-          return await loginUser({ email, password });
-        }
-      } else {
-        try {
-          return await loginUser({ email, password });
-        } catch {
-          return await registerUser({ name, email, password });
-        }
-      }
+      return parseAuthResponse(result);
     } catch (err: any) {
       return rejectWithValue(err.message || 'Google login failed. Please try again.');
     }
