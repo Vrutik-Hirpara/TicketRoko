@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Minus, Plus, ChevronLeft, MapPin, Ticket, CheckCircle2 } from 'lucide-react';
+import { Minus, Plus, ChevronLeft, MapPin, Ticket } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { BookingEvent } from '../../types/booking';
@@ -42,7 +42,7 @@ export function PartyPlotSelection({
       quantity,
       totalAmount,
       numTickets: quantity,
-    });
+    } as any);
   };
 
   return (
@@ -134,7 +134,6 @@ export function PartyPlotSelection({
               <Ticket className="w-3.5 h-3.5 text-blue-500" />
               ₹{event.ticketPrice.toLocaleString('en-IN')} per ticket
             </span>
-            <span className="w-px h-4 bg-gray-200" />
 
           </div>
 

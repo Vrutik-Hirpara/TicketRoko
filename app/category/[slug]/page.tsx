@@ -170,9 +170,10 @@ export default function CategorySlugPage() {
 
     // Filter by selected city (backend ignores ?city= param for this endpoint)
     if (location?.slug) {
-      result = result.filter(event =>
-        event.city?.toLowerCase() === location.slug?.toLowerCase()
-      );
+      result = result.filter(event => {
+        const eventCity = event.city || (event as any).hall?.city || (event as any).partyPlot?.city || '';
+        return eventCity.toLowerCase() === location.slug?.toLowerCase();
+      });
     }
 
     if (selectedDates.length > 0 || dateRange.start || dateRange.end) {
