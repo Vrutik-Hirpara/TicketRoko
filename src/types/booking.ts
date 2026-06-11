@@ -50,6 +50,7 @@ export interface EventBookingPayload {
   soldSeats: number;
   availableSeats: number;
   sectionSummary: SectionSummary[];
+  partyPlot?: import('../store/movieSlice').PartyPlotData | null;
 }
 
 /** Normalized seat used by UI components */
@@ -87,6 +88,7 @@ export interface BookingEvent {
   availableSeats: number;
   hallName?: string;
   showTimings: string[];
+  partyPlot?: import('../store/movieSlice').PartyPlotData | null;
 }
 
 export type SeatVisualState = 'available' | 'selected' | 'sold';

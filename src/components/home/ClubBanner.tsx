@@ -41,6 +41,8 @@ export const ClubBanner = () => {
                 src="/giftcard.png"
                 alt="TicketRoko Club Card"
                 fill
+                sizes="(max-width: 768px) 280px, 430px"
+                quality={90}
                 className="object-contain"
                 priority
               />

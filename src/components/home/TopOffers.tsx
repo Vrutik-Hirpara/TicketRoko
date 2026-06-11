@@ -55,6 +55,8 @@ export const TopOffers = () => {
                     src={offer.image}
                     alt={offer.title}
                     fill
+                    sizes="120px"
+                    quality={85}
                     className="object-contain"
                   />
                 </div>

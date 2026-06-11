@@ -65,22 +65,44 @@ export function useEventBooking(slug: string): UseEventBookingResult {
     load();
   }, [slug, load, applyPayload]);
 
+  // ── Polling fallback: refresh seat layout every 15s in case socket event is missed ──
+  useEffect(() => {
+    if (!slug) return;
+    const interval = setInterval(() => {
+      load();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [slug, load]);
+
   useEffect(() => {
     const eventId = payload?.event?.id;
-    if (!eventId) return;
+    if (!eventId || !slug) return;
 
-    const socket = io(UPLOADS_URL, {
-      transports: ['websocket', 'polling']
+    console.log('[Socket] Connecting to:', UPLOADS_URL, '| Event ID:', eventId, '| Slug:', slug);
+
+    const socket = io(UPLOADS_URL);
+
+    socket.on('connect', () => {
+      console.log('[Socket] CONNECTED ✅', socket.id);
+      // Try joining with BOTH the numeric ID and slug — backend may use either
+      socket.emit('join:event', eventId);
+      socket.emit('join:event', String(eventId));
+      socket.emit('join:event', slug);
+      console.log('[Socket] Joined room with id:', eventId, 'and slug:', slug);
     });
 
-    // Ensure room ID is a string, as socket.io rooms are typically strings
-    const roomId = String(eventId);
+    socket.on('connect_error', (err) => {
+      console.error('[Socket] CONNECTION ERROR ❌', err.message, err);
+    });
 
-    socket.emit('join:event', roomId);
+    socket.onAny((event, ...args) => {
+      console.log('[Socket] EVENT:', event, args);
+    });
 
     socket.on('seats:booked', ({ seat_ids }: { seat_ids: any[] }) => {
+      console.log('[Socket] seats:booked received ✅ seat_ids:', seat_ids);
       if (!seat_ids || !Array.isArray(seat_ids)) return;
-      
+
       const bookedIds = seat_ids.map(Number);
 
       setPayload((prev) => {
@@ -93,15 +115,17 @@ export function useEventBooking(slug: string): UseEventBookingResult {
         };
       });
 
-      // Refresh full layout to update section summaries and maintain consistency
-      load();
+      // Refresh layout after a small delay (backend db commit time)
+      setTimeout(() => load(), 1500);
     });
 
     return () => {
-      socket.emit('leave:event', roomId);
+      socket.emit('leave:event', eventId);
+      socket.emit('leave:event', slug);
       socket.disconnect();
+      console.log('[Socket] Disconnected from event:', eventId);
     };
-  }, [payload?.event?.id, load]);
+  }, [payload?.event?.id, slug]);
 
   const event = useMemo(
     () =>

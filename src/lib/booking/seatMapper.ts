@@ -132,6 +132,7 @@ export function bookingPayloadToEvent(
     availableSeats: availableSeats ?? event.total_tickets - event.sold_tickets,
     hallName: hall?.name,
     showTimings: [start],
+    partyPlot: payload.partyPlot ?? event.partyPlot ?? null,
   };
 }
 
@@ -158,5 +159,6 @@ export function eventDataToBookingFromApi(event: EventData, bannerUrl: string): 
     totalSeats: event.total_tickets,
     availableSeats: event.total_tickets - event.sold_tickets,
     showTimings: [start],
+    partyPlot: event.partyPlot ?? null,
   };
 }

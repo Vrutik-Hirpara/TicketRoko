@@ -14,6 +14,7 @@ export interface CheckoutSelection {
   selectedSeats: SeatData[];
   quantity: number;
   totalAmount: number;
+  numTickets?: number;
 }
 
 export function useBookingCheckout(event: BookingEvent, selectedTiming: string | null) {
@@ -46,6 +47,7 @@ export function useBookingCheckout(event: BookingEvent, selectedTiming: string |
         paymentMethod: 'cash',
         totalAmount: selection.totalAmount,
         quantity: selection.quantity,
+        numTickets: selection.numTickets,
       };
 
       savePendingBooking(pending);

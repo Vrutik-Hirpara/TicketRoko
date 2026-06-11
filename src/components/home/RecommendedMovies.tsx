@@ -96,7 +96,7 @@ export const RecommendedMovies = () => {
   };
 
   return (
-    <section className="container-max py-10 overflow-hidden relative">
+    <section className="container-max py-10 overflow-hidden relative" style={{ minHeight: '460px' }}>
       <SectionHeader title="Recommended for You" viewAllLink="/events" />
 
       <div className="relative w-full">
@@ -151,13 +151,14 @@ export const RecommendedMovies = () => {
               {error}
             </div>
           ) : movies.length > 0 ? (
-            movies.map((movie) => (
+            movies.map((movie, idx) => (
               <div
                 key={movie.id}
                 className="flex-shrink-0 w-[207px] snap-start"
               >
                 <MovieCard
                   id={movie.id}
+                  index={idx}
                   slug={movie.slug}
                   title={movie.title}
                   description={movie.description}

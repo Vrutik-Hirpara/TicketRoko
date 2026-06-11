@@ -8,6 +8,7 @@ import { getFullImageUrl } from '../../utils/constants';
 
 interface MovieCardProps {
   id: number;
+  index?: number;       // used to set priority only for first-viewport cards
   slug: string;
   title: string;
   description?: string;
@@ -21,6 +22,7 @@ interface MovieCardProps {
 
 export const MovieCard = ({
   id,
+  index = 99,
   slug,
   title,
   description,
@@ -65,8 +67,12 @@ export const MovieCard = ({
           src={getFullImageUrl(imageUrl)}
           alt={title}
           fill
+          // Only eagerly load cards visible in the first viewport (first ~4).
+          // All others lazy-load as the user scrolls — prevents bandwidth waste.
+          priority={index < 4}
+          loading={index < 4 ? 'eager' : 'lazy'}
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          priority
+          quality={80}
           className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
         />
         {formattedDate && (

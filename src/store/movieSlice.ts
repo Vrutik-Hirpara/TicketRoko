@@ -17,10 +17,20 @@ export interface OrganizerData {
   email: string;
 }
 
+export interface PartyPlotData {
+  id: number;
+  name: string;
+  description: string;
+  image: string | null;
+  total_tickets: number;
+  available_tickets: number;
+}
+
 export interface EventData {
   id: number;
   organizer_id: number;
-  hall_id: number;
+  hall_id: number | null;
+  party_plot_id?: number | null;
   category_id: number;
   title: string;
   slug: string;
@@ -46,6 +56,7 @@ export interface EventData {
   created_at: string;
   updated_at: string;
   organizer?: OrganizerData;
+  partyPlot?: PartyPlotData | null;
 }
 
 interface Pagination {

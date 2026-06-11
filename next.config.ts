@@ -2,30 +2,48 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    qualities: [100, 75] as any,
+    // ─── Allowed quality levels ───────────────────────────────────────────────
+    // 75 is the default for content images; 90 for high-fidelity banners.
+    // Remove non-standard `as any` — the correct field is just quality on <Image>.
+    // ─── Cache ───────────────────────────────────────────────────────────────
+    // Default is 60s. For production, cache optimised images for 7 days.
+    minimumCacheTTL: 60 * 60 * 24 * 7,
+
+    // ─── Breakpoints matched to Tailwind/site breakpoints ────────────────────
+    // deviceSizes: widths used when sizes="Xvw" or fill
+    deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920, 2048],
+    // imageSizes: widths used for fixed/intrinsic sizing (w=N)
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+
+    // ─── Serve WebP to all modern browsers (avif has higher CPU cost) ────────
+    formats: ['image/webp'],
+
+    // ─── Remote domains ──────────────────────────────────────────────────────
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'plus.unsplash.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: '**.unsplash.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'api.ticketroko.retailian.in',
-        port: '',
+        pathname: '/**',
+      },
+      {
+        // Support legacy http API in dev/staging
+        protocol: 'http',
+        hostname: 'api.ticketroko.retailian.in',
         pathname: '/**',
       },
     ],

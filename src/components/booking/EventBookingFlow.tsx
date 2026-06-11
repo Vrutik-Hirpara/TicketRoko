@@ -8,6 +8,7 @@ import type { BookingEvent, SeatData, SectionSummary } from '../../types/booking
 import { useBookingCheckout } from '../../hooks/useBookingCheckout';
 import { EventBookingDetails } from './EventBookingDetails';
 import { BookTicketsButton } from './BookTicketsButton';
+import { PartyPlotSelection } from './PartyPlotSelection';
 
 const HallSeatSelection = dynamic(
   () => import('./HallSeatSelection').then((m) => ({ default: m.HallSeatSelection })),
@@ -66,20 +67,8 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
 
   return (
     <div className="min-h-screen min-w-0 overflow-x-hidden" style={{ background: 'var(--booking-bg)' }}>
-      {/* <div className="container-max pt-4">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm font-medium mb-2 transition-opacity hover:opacity-80"
-          style={{ color: 'var(--booking-text-muted)' }}
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back
-        </button>
-      </div> */}
-
       {checkoutError && (
-        <div className="container-max mb-4">
+        <div className="container-max mb-4 pt-4">
           <p
             className="text-sm px-4 py-3 rounded-xl"
             style={{ color: 'var(--seat-sold-border)', background: 'var(--seat-sold-fill)' }}
@@ -99,13 +88,21 @@ export function EventBookingFlow({ event, seats, sectionSummary }: EventBookingF
         />
       )}
 
-      {showSeatSection && selectedTiming && (
+      {showSeatSection && selectedTiming && !event.partyPlot && (
         <HallSeatSelection
           event={event}
           seats={seats}
           sectionSummary={sectionSummary}
           hallName={event.hallName}
           showTiming={selectedTiming}
+          onProceed={proceedToCheckout}
+          submitting={submitting}
+        />
+      )}
+
+      {showSeatSection && selectedTiming && event.partyPlot && (
+        <PartyPlotSelection
+          event={event}
           onProceed={proceedToCheckout}
           submitting={submitting}
         />

@@ -136,29 +136,93 @@ export const fetchFilteredPaginatedEvents = createAsyncThunk<
   }
 );
 
-/** Resolve numeric event id from slug (booking-layout uses id, not slug) */
-async function resolveEventId(slugOrId: string): Promise<string> {
-  if (/^\d+$/.test(slugOrId)) return slugOrId;
-
-  const response = await fetch(`${BASE_URL}/events/${slugOrId}`);
-  if (!response.ok) {
-    throw new Error(`Event not found (${response.status})`);
+/** Resolve event by slug — returns id AND full EventData (including partyPlot) */
+async function resolveEvent(slugOrId: string): Promise<{ id: string; eventData: EventData }> {
+  if (/^\d+$/.test(slugOrId)) {
+    // Numeric id — fetch event to get partyPlot
+    const res = await fetch(`${BASE_URL}/events/${slugOrId}`);
+    if (!res.ok) throw new Error(`Event not found (${res.status})`);
+    const json = await res.json();
+    const data = json?.data as EventData;
+    if (!data?.id) throw new Error('Event not found');
+    return { id: String(data.id), eventData: data };
   }
 
+  const response = await fetch(`${BASE_URL}/events/${slugOrId}`);
+  if (!response.ok) throw new Error(`Event not found (${response.status})`);
   const result = await response.json();
-  const id = result?.data?.id;
-  if (!id) throw new Error('Event not found');
-
-  return String(id);
+  const data = result?.data as EventData;
+  if (!data?.id) throw new Error('Event not found');
+  return { id: String(data.id), eventData: data };
 }
 
 /**
  * Booking page — GET /events/:id/booking-layout
- * @see https://api.ticketroko.retailian.in/api/events/2/booking-layout
+ *
+ * For Party Plot events (party_plot_id present, no hall_id):
+ *   → Skip booking-layout API (no seat map). Fetch partyPlot details from
+ *     GET /party-plots/{eventId} and return a minimal payload.
+ *
+ * For Hall events:
+ *   → Fetch booking-layout as normal.
  */
 export async function fetchEventBooking(slugOrId: string): Promise<EventBookingPayload> {
-  const eventId = await resolveEventId(slugOrId);
+  const { id: eventId, eventData } = await resolveEvent(slugOrId);
 
+  const isPartyPlot = !!(eventData.party_plot_id && !eventData.hall_id);
+
+  if (isPartyPlot) {
+    // Get nested partyPlot — may already be in eventData (list endpoint),
+    // otherwise fetch from /party-plots/{eventId}
+    let partyPlot = eventData.partyPlot ?? null;
+
+    if (!partyPlot) {
+      try {
+        // The single event API /events/:id omits the partyPlot object.
+        // The /party-plots/:id API is protected.
+        // So we fetch the /events list API to extract the partyPlot object.
+        const eventsRes = await fetch(`${BASE_URL}/events`);
+        if (eventsRes.ok) {
+          const eventsJson = await eventsRes.ok ? await eventsRes.json() : null;
+          if (eventsJson?.success && Array.isArray(eventsJson.data)) {
+            const listEvent = eventsJson.data.find((e: any) => e.id === Number(eventId));
+            if (listEvent && listEvent.partyPlot) {
+              partyPlot = listEvent.partyPlot;
+            }
+          }
+        }
+      } catch {
+        // Ignore — we'll use whatever we have
+      }
+
+      // ── Fallback: if fetch failed, construct a basic partyPlot object ──
+      // This ensures the UI still routes to PartyPlotSelection instead of empty seating map.
+      if (!partyPlot) {
+        partyPlot = {
+          id: eventData.party_plot_id as number,
+          name: eventData.title,
+          description: eventData.description || 'Party Plot Event',
+          image: eventData.banner_url || null,
+          total_tickets: eventData.total_tickets,
+          available_tickets: eventData.total_tickets - eventData.sold_tickets,
+        };
+      }
+    }
+
+    return {
+      event: { ...eventData, partyPlot },
+      hall: { id: 0, name: partyPlot?.name ?? 'Party Plot', city: eventData.city || '' },
+      seats: [],
+      bookedSeatIds: [],
+      totalSeats: eventData.total_tickets,
+      soldSeats: eventData.sold_tickets,
+      availableSeats: eventData.total_tickets - eventData.sold_tickets,
+      sectionSummary: [],
+      partyPlot,
+    };
+  }
+
+  // ── Hall: fetch seating layout from API ──
   const response = await fetch(`${BASE_URL}/events/${eventId}/booking-layout`, {
     cache: 'no-store',
   });

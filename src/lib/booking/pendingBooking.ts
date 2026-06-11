@@ -9,6 +9,7 @@ export interface PendingBooking {
   paymentMethod?: string;
   totalAmount: number;
   quantity: number;
+  numTickets?: number;
 }
 
 const KEY = 'tr_pending_booking';

@@ -99,7 +99,7 @@ export const TrendingEvents = () => {
   };
 
   return (
-    <section className="container-max py-10 overflow-hidden relative">
+    <section className="container-max py-10 overflow-hidden relative" style={{ minHeight: '460px' }}>
       <SectionHeader title="Trending Near You" viewAllLink="/events/trending" />
 
       <div className="relative w-full">
@@ -154,13 +154,14 @@ export const TrendingEvents = () => {
               {trendingError}
             </div>
           ) : trending.length > 0 ? (
-            trending.map((event) => (
+            trending.map((event, idx) => (
               <div
                 key={event.id}
                 className="flex-shrink-0 w-[207px] snap-start"
               >
                 <MovieCard
                   id={event.id}
+                  index={idx}
                   slug={event.slug}
                   title={event.title}
                   description={event.description}

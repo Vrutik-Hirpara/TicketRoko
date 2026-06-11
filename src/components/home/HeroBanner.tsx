@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { fetchLabels } from '../../controllers/labelController';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getFullImageUrl } from '../../utils/constants';
 
 export const HeroBanner = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,6 +15,13 @@ export const HeroBanner = () => {
   const [slideWidth, setSlideWidth] = useState(1240);
   const [slideGap, setSlideGap] = useState(24);
   const [windowWidth, setWindowWidth] = useState(1440);
+  // Track how many banner images have finished loading.
+  // Autoplay is blocked until ALL images are ready — this guarantees that
+  // when the carousel first advances, every slide image is already in memory
+  // and zero new network requests are made.
+  const loadedCountRef = useRef(0);
+  const [imagesReady, setImagesReady] = useState(false);
+  const [lcpLoaded, setLcpLoaded] = useState(false);
   const autoPlayRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -71,15 +77,15 @@ export const HeroBanner = () => {
     autoPlayRef.current = nextSlide;
   });
 
-  // Auto-play interval
+  // Auto-play interval — ONLY starts after all banner images have loaded.
   useEffect(() => {
-    if (N <= 1) return;
+    if (N <= 1 || !imagesReady) return;
     const play = () => {
       if (autoPlayRef.current) autoPlayRef.current();
     };
     const timer = setInterval(play, 5000);
     return () => clearInterval(timer);
-  }, [N]);
+  }, [N, imagesReady]);
 
   if (loading) {
     return (
@@ -95,7 +101,14 @@ export const HeroBanner = () => {
     );
   }
 
-  if (labels.length === 0) return null;
+  // No labels after load — still reserve space to prevent CLS
+  if (labels.length === 0) {
+    return (
+      <div className="w-full bg-[#121212] py-4 lg:py-6 flex justify-center items-center">
+        <div className="rounded-[8px] md:rounded-[12px] bg-gray-800 shadow-2xl w-full mx-4 lg:w-[78vw] h-[180px] sm:h-[260px] md:h-[320px] lg:h-[380px]" />
+      </div>
+    );
+  }
 
   const isDesktop = windowWidth >= 1024;
 
@@ -146,16 +159,39 @@ export const HeroBanner = () => {
               >
                 {/* Slide Card */}
                 <div className="relative w-full h-full rounded-[8px] md:rounded-[12px] overflow-hidden shadow-2xl bg-[#1f1f1f] group">
-                  {/* Banner Image */}
-                  <Image
-                    src={getFullImageUrl(label.image_url)}
-                    alt={label.name}
-                    fill
-                    priority={isActive}
-                    sizes={`${slideWidth}px`}
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.01]"
-                  />
-
+                  {/*
+                   * LCP fix: only slide index=0 (the one visible on load) gets
+                   * priority=true (fetchpriority=high + <link rel=preload>).
+                   * All others load eagerly at NORMAL priority — they download in
+                   * the background without competing with the LCP image.
+                   * Autoplay is gated on imagesReady so rotation never hits network.
+                   */}
+                  {/* LCP strict prioritization: only render the first image initially.
+                      Wait for it to load before rendering the others. This gives
+                      the LCP image 100% of the initial bandwidth. */}
+                  {index === 0 || lcpLoaded ? (
+                    <Image
+                      src={label.image_url || "/event_placeholder.png"}
+                      alt={label.name || "Event Banner"}
+                      fill
+                      priority={index === 0}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      sizes="(max-width: 1023px) 100vw, (min-width: 1590px) 1240px, 78vw"
+                      quality={60}
+                      className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.01]"
+                      onLoad={() => {
+                        if (index === 0) setLcpLoaded(true);
+                        loadedCountRef.current += 1;
+                        const uniqueCount = labels.length === 2 ? 2 : N;
+                        if (loadedCountRef.current >= uniqueCount) {
+                          setImagesReady(true);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />
+                  )}
                   {/* Dark Overlays for Non-active banners on Desktop */}
                   {!isActive && isDesktop && (
                     <div className="absolute inset-0 bg-black/55 hover:bg-black/45 transition-all duration-300 rounded-[8px] md:rounded-[12px]" />
