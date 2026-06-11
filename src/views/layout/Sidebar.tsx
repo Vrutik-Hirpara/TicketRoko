@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
@@ -30,6 +30,20 @@ export const Sidebar = () => {
   const isOpen = useSelector((state: RootState) => state.ui.isSidebarOpen);
   const [helpOpen, setHelpOpen] = useState(false);
   const { isAuthenticated, user, hydrated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const handleSignOut = () => {
     dispatch(logout());
@@ -87,7 +101,7 @@ export const Sidebar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => dispatch(toggleSidebar())}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] touch-none overscroll-none"
           />
 
           {/* Sidebar Panel */}
@@ -96,7 +110,7 @@ export const Sidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-            className="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white z-[70] shadow-2xl flex flex-col overflow-hidden"
+            className="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white z-[70] shadow-2xl flex flex-col overflow-hidden overscroll-contain"
           >
             {/* Header: Hey! Edit Profile */}
             <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white relative">
@@ -145,7 +159,7 @@ export const Sidebar = () => {
             </div>
 
             {/* Menu Items */}
-            <div className="flex-1 overflow-y-auto py-2">
+            <div className="flex-1 overflow-y-auto overscroll-contain py-2">
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
                 const isHelp = item.label === 'Help & Support';
