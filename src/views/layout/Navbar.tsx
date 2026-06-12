@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Search, MapPin, Menu, X, ChevronRight, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,6 +31,8 @@ export const Navbar = () => {
   } = useNavbar();
 
   const { cities } = useSelector((state: RootState) => state.app);
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login' || pathname === '/register';
   const [isCityDropdownOpen, setIsCityDropdownOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -185,6 +188,14 @@ export const Navbar = () => {
                   <Menu className="w-6 h-6" />
                 </button>
               </>
+            ) : isAuthPage ? (
+              <button
+                className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                onClick={handleToggleMenu}
+                aria-label="Toggle menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
             ) : (
               <motion.button
                 onClick={() => dispatch(setModal({ isOpen: true, type: "login" }))}

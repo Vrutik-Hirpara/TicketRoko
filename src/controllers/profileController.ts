@@ -112,25 +112,25 @@ export const fetchMyBookings = createAsyncThunk<
 );
 
 export const fetchPastEvents = createAsyncThunk<
-  ProfileEvent[],
+  { events: ProfileEvent[]; pagination?: EventsApiResponse['pagination'] },
   { page?: number; limit?: number; signal?: AbortSignal } | undefined,
   { state: RootState }
 >(
   'profile/fetchPastEvents',
   async (args, { getState, rejectWithValue }) => {
     try {
-      const token = getState().auth.token;
-      if (!token) throw new Error('Not authenticated');
-
       const page = args?.page || 1;
       const limit = args?.limit || 20;
 
       const result = await getJson<EventsApiResponse>(
         `/events?page=${page}&limit=${limit}&search=&period=past`,
-        { token, signal: args?.signal }
+        { signal: args?.signal }
       );
 
-      return result.data || result.events || [];
+      return {
+        events: result.data || result.events || [],
+        pagination: result.pagination
+      };
     } catch (err: any) {
       if (err.name === 'AbortError') throw err;
       return rejectWithValue(err.message || 'Failed to fetch past events');
@@ -139,25 +139,25 @@ export const fetchPastEvents = createAsyncThunk<
 );
 
 export const fetchUpcomingEvents = createAsyncThunk<
-  ProfileEvent[],
+  { events: ProfileEvent[]; pagination?: EventsApiResponse['pagination'] },
   { page?: number; limit?: number; signal?: AbortSignal } | undefined,
   { state: RootState }
 >(
   'profile/fetchUpcomingEvents',
   async (args, { getState, rejectWithValue }) => {
     try {
-      const token = getState().auth.token;
-      if (!token) throw new Error('Not authenticated');
-
       const page = args?.page || 1;
       const limit = args?.limit || 20;
 
       const result = await getJson<EventsApiResponse>(
         `/events?page=${page}&limit=${limit}&search=&period=upcoming`,
-        { token, signal: args?.signal }
+        { signal: args?.signal }
       );
 
-      return result.data || result.events || [];
+      return {
+        events: result.data || result.events || [],
+        pagination: result.pagination
+      };
     } catch (err: any) {
       if (err.name === 'AbortError') throw err;
       return rejectWithValue(err.message || 'Failed to fetch upcoming events');

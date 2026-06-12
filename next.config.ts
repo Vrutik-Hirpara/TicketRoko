@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     // ─── Allowed quality levels ───────────────────────────────────────────────
     // 75 is the default for content images; 90 for high-fidelity banners.
-    // Remove non-standard `as any` — the correct field is just quality on <Image>.
+    qualities: [75, 80, 85, 90, 100],
     // ─── Cache ───────────────────────────────────────────────────────────────
     // Default is 60s. For production, cache optimised images for 7 days.
     minimumCacheTTL: 60 * 60 * 24 * 7,

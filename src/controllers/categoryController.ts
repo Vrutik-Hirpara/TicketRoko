@@ -15,7 +15,6 @@ export const fetchCategories = createAsyncThunk<CategoryData[], void>(
       const items = json?.data ?? json;
       if (!Array.isArray(items)) return rejectWithValue('Unexpected response format');
       return items
-        .filter((c: any) => c.is_active)
         .map((c: any) => ({
           id: c.id,
           name: c.name,

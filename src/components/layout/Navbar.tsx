@@ -9,6 +9,7 @@ import { Search, MapPin, ChevronDown, ArrowRight, LogOut, Menu, X, ChevronRight,
 import { motion, AnimatePresence } from 'framer-motion';
 import { RootState } from '../../store';
 import { logout as logoutAction } from '../../store/authSlice';
+import { setModal } from '../../store/uiSlice';
 import { fetchCities } from '../../controllers/appController';
 import { setLocation, City } from '../../store/appSlice';
 
@@ -42,6 +43,20 @@ export const Navbar = () => {
     setIsSidebarOpen(false);
     window.location.href = '/login';
   };
+
+  React.useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [isSidebarOpen]);
 
   return (
     <>
@@ -137,15 +152,13 @@ export const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <Link href="/login">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-2 bg-[#2563EB] text-white px-7 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-blue-600/20 flex-shrink-0">
-                  <span>Login</span>
-                  <ArrowRight className="h-4 w-4" />
-                </motion.button>
-              </Link>
+              <button
+                onClick={() => dispatch(setModal({ isOpen: true, type: 'login' }))}
+                className="flex items-center gap-2 bg-[#2563EB] text-white px-7 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-blue-600/20 flex-shrink-0"
+              >
+                <span>Login</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
             )}
           </div>
         </div>
@@ -174,10 +187,14 @@ export const Navbar = () => {
               {/* Header */}
               <div className="p-5 flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Hey! {user?.name || 'User'}</h2>
-                  <Link href="/profile/edit" onClick={() => setIsSidebarOpen(false)} className="text-gray-500 text-sm flex items-center mt-1 hover:underline">
-                    Edit Profile <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
-                  </Link>
+                  <h2 className="text-2xl font-bold text-gray-900">Hey! {isAuthenticated ? (user?.name || 'User') : 'Guest'}</h2>
+                  {isAuthenticated ? (
+                    <Link href="/profile/edit" onClick={() => setIsSidebarOpen(false)} className="text-gray-500 text-sm flex items-center mt-1 hover:underline">
+                      Edit Profile <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                    </Link>
+                  ) : (
+                    <p className="text-gray-400 text-sm mt-1">Sign in to access all features</p>
+                  )}
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -188,52 +205,97 @@ export const Navbar = () => {
               </div>
 
               {/* Info Banner */}
-              <div className="mx-5 mb-5 p-4 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-between cursor-pointer group">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-800">Get tickets on Whatsapp/SMS!</h3>
-                    <p className="text-[13px] text-orange-600 mt-0.5">Add your Mobile Number</p>
+              {isAuthenticated && (
+                <div className="mx-5 mb-5 p-4 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-between cursor-pointer group">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-800">Get tickets on Whatsapp/SMS!</h3>
+                      <p className="text-[13px] text-orange-600 mt-0.5">Add your Mobile Number</p>
+                    </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 transition-colors" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 transition-colors" />
-              </div>
+              )}
 
               {/* Menu Items */}
               <div className="flex-1 flex flex-col">
-                <Link href="/bookings/my-bookings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <Ticket className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <div>
-                      <h3 className="text-[15px] font-medium text-gray-800">My Booking</h3>
-                      <p className="text-[12px] text-gray-400 mt-0.5">View all your bookings & purchases</p>
+                {/* My Booking */}
+                {isAuthenticated ? (
+                  <Link href="/bookings/my-bookings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <Ticket className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-800">My Booking</h3>
+                        <p className="text-[12px] text-gray-400 mt-0.5">View all your bookings & purchases</p>
+                      </div>
                     </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
-
-                <Link href="/profile/past-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <div>
-                      <h3 className="text-[15px] font-medium text-gray-800">Past Events</h3>
-                      <p className="text-[12px] text-gray-400 mt-0.5">View events you have attended</p>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 cursor-not-allowed opacity-40">
+                    <div className="flex items-center gap-4">
+                      <Ticket className="w-5 h-5 text-gray-300" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-400">My Booking</h3>
+                        <p className="text-[12px] text-gray-300 mt-0.5">View all your bookings & purchases</p>
+                      </div>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-gray-200" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
+                )}
 
-                <Link href="/profile/upcoming-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <CalendarDays className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <div>
-                      <h3 className="text-[15px] font-medium text-gray-800">Upcoming Events</h3>
-                      <p className="text-[12px] text-gray-400 mt-0.5">Your upcoming booked experiences</p>
+                {/* Past Events */}
+                {isAuthenticated ? (
+                  <Link href="/profile/past-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <History className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-800">Past Events</h3>
+                        <p className="text-[12px] text-gray-400 mt-0.5">View events you have attended</p>
+                      </div>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 cursor-not-allowed opacity-40">
+                    <div className="flex items-center gap-4">
+                      <History className="w-5 h-5 text-gray-300" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-400">Past Events</h3>
+                        <p className="text-[12px] text-gray-300 mt-0.5">View events you have attended</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-200" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
+                )}
 
+                {/* Upcoming Events */}
+                {isAuthenticated ? (
+                  <Link href="/profile/upcoming-events" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <CalendarDays className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-800">Upcoming Events</h3>
+                        <p className="text-[12px] text-gray-400 mt-0.5">Your upcoming booked experiences</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 cursor-not-allowed opacity-40">
+                    <div className="flex items-center gap-4">
+                      <CalendarDays className="w-5 h-5 text-gray-300" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-400">Upcoming Events</h3>
+                        <p className="text-[12px] text-gray-300 mt-0.5">Your upcoming booked experiences</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-200" />
+                  </div>
+                )}
+
+                {/* Help & Support — always enabled */}
                 <Link href="/support" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
                   <div className="flex items-center gap-4">
                     <HelpCircle className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
@@ -245,38 +307,75 @@ export const Navbar = () => {
                   <ChevronRight className="w-4 h-4 text-gray-300" />
                 </Link>
 
-                <Link href="/settings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <div>
-                      <h3 className="text-[15px] font-medium text-gray-800">Accounts & Settings</h3>
-                      <p className="text-[12px] text-gray-400 mt-0.5">Location, Payments, Permissions & More</p>
+                {/* Accounts & Settings */}
+                {isAuthenticated ? (
+                  <Link href="/settings" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-800">Accounts & Settings</h3>
+                        <p className="text-[12px] text-gray-400 mt-0.5">Location, Payments, Permissions & More</p>
+                      </div>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 cursor-not-allowed opacity-40">
+                    <div className="flex items-center gap-4">
+                      <Settings className="w-5 h-5 text-gray-300" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-400">Accounts & Settings</h3>
+                        <p className="text-[12px] text-gray-300 mt-0.5">Location, Payments, Permissions & More</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-200" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
+                )}
 
-                <Link href="/partner" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <Handshake className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <div>
-                      <h3 className="text-[15px] font-medium text-gray-800">Partner With Us</h3>
-                      <p className="text-[12px] text-gray-400 mt-0.5">List your event or collaborate with us</p>
+                {/* Partner With Us */}
+                {isAuthenticated ? (
+                  <Link href="/partner" onClick={() => setIsSidebarOpen(false)} className="flex items-center justify-between px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center gap-4">
+                      <Handshake className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-800">Partner With Us</h3>
+                        <p className="text-[12px] text-gray-400 mt-0.5">List your event or collaborate with us</p>
+                      </div>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 cursor-not-allowed opacity-40">
+                    <div className="flex items-center gap-4">
+                      <Handshake className="w-5 h-5 text-gray-300" />
+                      <div>
+                        <h3 className="text-[15px] font-medium text-gray-400">Partner With Us</h3>
+                        <p className="text-[12px] text-gray-300 mt-0.5">List your event or collaborate with us</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-200" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300" />
-                </Link>
+                )}
               </div>
 
-              {/* Sign out button */}
+              {/* Sign out / Sign in button */}
               <div className="p-6 mt-auto border-t border-gray-100">
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#2563EB] text-[#2563EB] rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign out
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#2563EB] text-[#2563EB] rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setIsSidebarOpen(false); dispatch(setModal({ isOpen: true, type: 'login' })); }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#2563EB] text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Sign in
+                  </button>
+                )}
               </div>
             </motion.div>
           </>

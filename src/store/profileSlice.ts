@@ -15,10 +15,12 @@ interface ProfileState {
   pastEvents: ProfileEvent[];
   pastEventsLoading: boolean;
   pastEventsError: string | null;
+  pastEventsPagination: { page: number; totalPages: number; total: number } | null;
 
   upcomingEvents: ProfileEvent[];
   upcomingEventsLoading: boolean;
   upcomingEventsError: string | null;
+  upcomingEventsPagination: { page: number; totalPages: number; total: number } | null;
 }
 
 const initialState: ProfileState = {
@@ -29,10 +31,12 @@ const initialState: ProfileState = {
   pastEvents: [],
   pastEventsLoading: false,
   pastEventsError: null,
+  pastEventsPagination: null,
 
   upcomingEvents: [],
   upcomingEventsLoading: false,
   upcomingEventsError: null,
+  upcomingEventsPagination: null,
 };
 
 const profileSlice = createSlice({
@@ -65,7 +69,12 @@ const profileSlice = createSlice({
       })
       .addCase(fetchPastEvents.fulfilled, (state, action) => {
         state.pastEventsLoading = false;
-        state.pastEvents = action.payload;
+        state.pastEvents = action.payload.events;
+        state.pastEventsPagination = action.payload.pagination ? {
+          page: action.payload.pagination.page,
+          totalPages: action.payload.pagination.totalPages,
+          total: action.payload.pagination.total,
+        } : null;
       })
       .addCase(fetchPastEvents.rejected, (state, action) => {
         state.pastEventsLoading = false;
@@ -80,7 +89,12 @@ const profileSlice = createSlice({
       })
       .addCase(fetchUpcomingEvents.fulfilled, (state, action) => {
         state.upcomingEventsLoading = false;
-        state.upcomingEvents = action.payload;
+        state.upcomingEvents = action.payload.events;
+        state.upcomingEventsPagination = action.payload.pagination ? {
+          page: action.payload.pagination.page,
+          totalPages: action.payload.pagination.totalPages,
+          total: action.payload.pagination.total,
+        } : null;
       })
       .addCase(fetchUpcomingEvents.rejected, (state, action) => {
         state.upcomingEventsLoading = false;

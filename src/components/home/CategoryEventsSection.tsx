@@ -1,29 +1,22 @@
 'use client';
 
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionHeader } from '../ui/SectionHeader';
 import { MovieCard } from '../ui/MovieCard';
 import { CarouselArrows } from '../ui/CarouselArrows';
-import { AppDispatch, RootState } from '../../store';
-import { fetchTrendingEvents } from '../../controllers/eventController';
+import { RootState } from '../../store';
+import { BASE_URL } from '../../utils/constants';
+import { EventData } from '../../store/movieSlice';
 
-/**
- * VIEW: Trending Near You section.
- * Identical design & functionality to RecommendedMovies —
- * only data source differs (fetchTrendingEvents → /events/trending).
- * Drag-to-scroll uses refs (not state) so clicks always reach cards.
- */
-
-export const TrendingEvents = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { trending, trendingLoading, trendingError } = useSelector(
-    (state: RootState) => state.movies
-  );
+export const CategoryEventsSection = ({ category }: { category: any }) => {
   const { location } = useSelector((state: RootState) => state.app);
   const router = useRouter();
+
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const isDraggingRef = React.useRef(false);
@@ -35,9 +28,36 @@ export const TrendingEvents = () => {
   const [showRightArrow, setShowRightArrow] = React.useState(false);
 
   const citySlug = location?.slug;
-  React.useEffect(() => {
-    dispatch(fetchTrendingEvents());
-  }, [dispatch, citySlug]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const endpoint = citySlug 
+          ? `${BASE_URL}/events/category/${category.slug}?city=${citySlug}` 
+          : `${BASE_URL}/events/category/${category.slug}`;
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        const json = await res.json();
+        if (isMounted) {
+          if (json.success && Array.isArray(json.data)) {
+            setEvents(json.data);
+          } else {
+            setEvents([]);
+          }
+          setLoading(false);
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setError(err.message || 'Error fetching events');
+          setLoading(false);
+        }
+      }
+    };
+    fetchEvents();
+    return () => { isMounted = false; };
+  }, [category.slug, citySlug]);
 
   const updateArrowVisibility = React.useCallback(() => {
     const el = scrollRef.current;
@@ -55,7 +75,7 @@ export const TrendingEvents = () => {
       clearTimeout(timer);
       window.removeEventListener('resize', updateArrowVisibility);
     };
-  }, [trending, updateArrowVisibility]);
+  }, [events, updateArrowVisibility]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -84,7 +104,6 @@ export const TrendingEvents = () => {
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
-    // Mathematically perfect step: 5 cards (207px width + 32px gap) = 1195px
     const scrollAmount = 1195;
     el.scrollTo({
       left: el.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount),
@@ -95,13 +114,19 @@ export const TrendingEvents = () => {
 
   const handleCardClick = (slug: string) => {
     if (!hasDraggedRef.current) {
-      router.push(`/events/trending/${slug}`);
+      router.push(`/events/${slug}`);
     }
   };
 
+  if (!loading && !error && events.length === 0) {
+    return null; // Do not render section if no events
+  }
+
   return (
-    <section className="container-max py-10 overflow-hidden relative" style={{ minHeight: '460px' }}>
-      <SectionHeader title="Trending Near You" viewAllLink="/events/trending" />
+    <div className="relative" style={{ minHeight: '380px' }}>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-2xl font-bold text-gray-900 capitalize">{category.name}</h3>
+      </div>
 
       <div className="relative w-full">
         <CarouselArrows 
@@ -120,7 +145,7 @@ export const TrendingEvents = () => {
           className="flex gap-8 overflow-x-auto no-scrollbar pt-4 pb-8 select-none scroll-smooth snap-x snap-mandatory"
           style={{ cursor: 'grab' }}
         >
-          {trendingLoading ? (
+          {loading ? (
             Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
@@ -133,15 +158,15 @@ export const TrendingEvents = () => {
                 </div>
               </div>
             ))
-          ) : trendingError ? (
+          ) : error ? (
             <div
               className="flex w-full h-[300px] items-center justify-center text-sm"
               style={{ color: '#EF4444' }}
             >
-              {trendingError}
+              {error}
             </div>
-          ) : trending.length > 0 ? (
-            trending.map((event, idx) => (
+          ) : events.length > 0 ? (
+            events.map((event, idx) => (
               <div
                 key={event.id}
                 className="flex-shrink-0 w-[207px] snap-start"
@@ -160,16 +185,9 @@ export const TrendingEvents = () => {
                 />
               </div>
             ))
-          ) : (
-            <div
-              className="flex w-full h-[300px] items-center justify-center text-sm"
-              style={{ color: 'var(--gray-400)' }}
-            >
-              No trending events available.
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
-    </section>
+    </div>
   );
 };

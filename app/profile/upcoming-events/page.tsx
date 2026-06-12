@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -15,15 +15,13 @@ export default function UpcomingEventsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { isAuthenticated, hydrated } = useSelector((s: RootState) => s.auth);
-  const { upcomingEvents, upcomingEventsLoading, upcomingEventsError } = useSelector((s: RootState) => s.profile);
+  const { upcomingEvents, upcomingEventsLoading, upcomingEventsError, upcomingEventsPagination } = useSelector((s: RootState) => s.profile);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!isAuthenticated) { router.replace('/login'); return; }
-    const controller = new AbortController();
-    dispatch(fetchUpcomingEvents({ signal: controller.signal }));
-    return () => controller.abort();
-  }, [dispatch, hydrated, isAuthenticated, router]);
+    dispatch(fetchUpcomingEvents({ page, limit: 20 }));
+  }, [dispatch, hydrated, page]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -102,6 +100,28 @@ export default function UpcomingEventsPage() {
               </motion.div>
             ))}
           </motion.div>
+        )}
+
+        {!upcomingEventsLoading && upcomingEventsPagination && upcomingEventsPagination.totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-600 font-medium">
+              Page {page} of {upcomingEventsPagination.totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(upcomingEventsPagination.totalPages, p + 1))}
+              disabled={page >= upcomingEventsPagination.totalPages}
+              className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
         )}
       </div>
     </div>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { MovieCard } from '../ui/MovieCard';
+import { CarouselArrows } from '../ui/CarouselArrows';
 import { AppDispatch, RootState } from '../../store';
 import { fetchRecommendedMovies } from '../../controllers/eventController';
 
@@ -100,25 +101,11 @@ export const RecommendedMovies = () => {
       <SectionHeader title="Recommended for You" viewAllLink="/events" />
 
       <div className="relative w-full">
-        {/* Left Arrow Button */}
-        {showLeftArrow && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute -left-4 top-[176px] -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-300 z-40 shadow-2xl border border-white/10 cursor-pointer"
-          >
-            <ChevronLeft className="w-7 h-7" />
-          </button>
-        )}
-
-        {/* Right Arrow Button */}
-        {showRightArrow && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute -right-4 top-[176px] -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-300 z-40 shadow-2xl border border-white/10 cursor-pointer"
-          >
-            <ChevronRight className="w-7 h-7" />
-          </button>
-        )}
+        <CarouselArrows 
+          showLeft={showLeftArrow} 
+          showRight={showRightArrow} 
+          onScroll={scroll} 
+        />
 
         <div
           ref={scrollRef}

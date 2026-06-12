@@ -1,62 +1,48 @@
 'use client';
 
-import { FormEvent, useState, Suspense } from 'react';
+import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuthPageLayout } from '../../src/components/auth/AuthPageLayout';
-import { GoogleLoginButton } from '../../src/components/auth/GoogleLoginButton';
-import { registerUser } from '../../src/controllers/authController';
-import { setCredentials } from '../../src/store/authSlice';
-import { useCompletePendingBooking } from '../../src/hooks/useCompletePendingBooking';
-import type { AppDispatch } from '../../src/store';
+import { GoogleLoginButton } from './GoogleLoginButton';
+import { loginUser } from '../../controllers/authController';
+import { setCredentials } from '../../store/authSlice';
+import { useCompletePendingBooking } from '../../hooks/useCompletePendingBooking';
+import type { AppDispatch } from '../../store';
 
-function RegisterForm() {
-  const searchParams = useSearchParams();
+interface LoginFormComponentProps {
+  returnUrl?: string;
+  checkout?: boolean;
+  onSuccess?: () => void;
+}
+
+export function LoginFormComponent({ returnUrl = '/', checkout = false, onSuccess }: LoginFormComponentProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
   const { completeIfPending, completing } = useCompletePendingBooking();
 
-  const returnUrl = searchParams.get('returnUrl') || '/';
-  const checkout = searchParams.get('checkout') === '1';
+  const registerHref = (returnUrl === '/' && !checkout)
+    ? '/register'
+    : `/register?returnUrl=${encodeURIComponent(returnUrl)}${checkout ? '&checkout=1' : ''}`;
 
-  const loginHref = (returnUrl === '/' && !checkout)
-    ? '/login'
-    : `/login?returnUrl=${encodeURIComponent(returnUrl)}${checkout ? '&checkout=1' : ''}`;
-
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      const res = await registerUser({ name, email, password });
-      if (res.token) {
-        dispatch(setCredentials({ token: res.token, user: res.user }));
-      }
-
-      setName('');
-      setEmail('');
-      setPassword('');
-
-      setSuccess('Registration successful! Redirecting to login...');
-
-      setTimeout(() => {
-        router.push(loginHref);
-      }, 3000);
+      const { token, user } = await loginUser({ email, password });
+      dispatch(setCredentials({ token, user }));
+      await completeIfPending(returnUrl, checkout);
+      if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -65,37 +51,19 @@ function RegisterForm() {
   const handleGoogleSuccess = async (token: string, user: any) => {
     dispatch(setCredentials({ token, user }));
     await completeIfPending(returnUrl, checkout);
+    if (onSuccess) onSuccess();
   };
 
-  const busy = loading || completing || !!success;
+  const busy = loading || completing;
 
   return (
-    <AuthPageLayout
-      title="Create your account"
-      subtitle={
-        checkout
-          ? 'Register to complete your seat booking'
-          : 'Join TicketRoko to book events'
-      }
-      footer={
-        <>
-          Already have an account?{' '}
-          <Link
-            href={loginHref}
-            className="font-semibold hover:underline"
-            style={{ color: 'var(--primary-blue)' }}
-          >
-            Sign in 
-          </Link>
-        </>
-      }
-    >
+    <div className="w-full">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Google Sign-In */}
         <div className="flex flex-col gap-3">
           <GoogleLoginButton
             returnUrl={returnUrl}
-            mode="register"
+            mode="login"
             onSuccess={handleGoogleSuccess}
             onError={(msg) => setError(msg)}
           />
@@ -120,43 +88,7 @@ function RegisterForm() {
               <span>{error}</span>
             </motion.div>
           )}
-
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="text-sm px-4 py-3 rounded-xl border border-green-200 text-green-700 bg-green-50 font-medium flex items-center gap-2"
-            >
-              <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold shrink-0 select-none">
-                ✓
-              </div>
-              <span>{success}</span>
-            </motion.div>
-          )}
         </AnimatePresence>
-
-        <div>
-          <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--booking-text-muted)' }}>
-            Full name
-          </label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--booking-text-muted)' }} />
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
-              style={{
-                background: 'var(--booking-surface-elevated)',
-                color: 'var(--booking-text)',
-                border: '1px solid var(--booking-border)',
-              }}
-            />
-          </div>
-        </div>
 
         <div>
           <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--booking-text-muted)' }}>
@@ -171,8 +103,8 @@ function RegisterForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@email.com"
-              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
+              placeholder="admin123@gmail.com"
+              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none focus:ring-2"
               style={{
                 background: 'var(--booking-surface-elevated)',
                 color: 'var(--booking-text)',
@@ -191,13 +123,12 @@ function RegisterForm() {
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
-              autoComplete="new-password"
+              autoComplete="current-password"
               required
-              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-10 pr-10 py-3 rounded-xl text-sm outline-none"
+              className="w-full pl-10 pr-10 py-3 rounded-xl text-sm outline-none focus:ring-2"
               style={{
                 background: 'var(--booking-surface-elevated)',
                 color: 'var(--booking-text)',
@@ -226,7 +157,7 @@ function RegisterForm() {
           style={{ background: 'var(--primary-blue)', color: 'var(--white)' }}
         >
           {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-          {completing ? 'Completing booking…' : busy ? 'Creating account…' : 'Register'}
+          {completing ? 'Completing booking…' : busy ? 'Signing in…' : 'Sign in'}
         </button>
         
         <p className="text-xs text-center text-gray-500 mt-2">
@@ -236,23 +167,6 @@ function RegisterForm() {
           <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
         </p>
       </form>
-    </AuthPageLayout>
-  );
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense
-      fallback={
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: 'var(--booking-bg)' }}
-        >
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--primary-blue)' }} />
-        </div>
-      }
-    >
-      <RegisterForm />
-    </Suspense>
+    </div>
   );
 }

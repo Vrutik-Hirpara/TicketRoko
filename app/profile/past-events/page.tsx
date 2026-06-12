@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -10,20 +10,20 @@ import { History, AlertCircle } from 'lucide-react';
 import { AppDispatch, RootState } from '../../../src/store';
 import { fetchPastEvents } from '../../../src/controllers/profileController';
 import { MovieCard } from '../../../src/components/ui/MovieCard';
+import { PastEventModal } from '../../../src/components/profile/PastEventModal';
 
 export default function PastEventsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { isAuthenticated, hydrated } = useSelector((s: RootState) => s.auth);
-  const { pastEvents, pastEventsLoading, pastEventsError } = useSelector((s: RootState) => s.profile);
+  const { pastEvents, pastEventsLoading, pastEventsError, pastEventsPagination } = useSelector((s: RootState) => s.profile);
+  const [page, setPage] = useState(1);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!isAuthenticated) { router.replace('/login'); return; }
-    const controller = new AbortController();
-    dispatch(fetchPastEvents({ signal: controller.signal }));
-    return () => controller.abort();
-  }, [dispatch, hydrated, isAuthenticated, router]);
+    dispatch(fetchPastEvents({ page, limit: 20 }));
+  }, [dispatch, hydrated, page]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -92,6 +92,7 @@ export default function PastEventsPage() {
                     eventType={event.event_type}
                     eventDate={event.event_date}
                     ticketPrice={event.ticket_price}
+                    onClick={() => setSelectedEvent(event)}
                   />
                   <div className="absolute top-2 right-2 pointer-events-none z-10">
                     <span className="px-2 py-0.5 bg-gray-800/80 text-white text-[10px] font-semibold rounded-full shadow-sm backdrop-blur-sm">
@@ -103,7 +104,34 @@ export default function PastEventsPage() {
             ))}
           </motion.div>
         )}
+
+        {!pastEventsLoading && pastEventsPagination && pastEventsPagination.totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-600 font-medium">
+              Page {page} of {pastEventsPagination.totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(pastEventsPagination.totalPages, p + 1))}
+              disabled={page >= pastEventsPagination.totalPages}
+              className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
+
+      <PastEventModal 
+        selectedEvent={selectedEvent} 
+        onClose={() => setSelectedEvent(null)} 
+      />
     </div>
   );
 }

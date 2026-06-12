@@ -31,9 +31,9 @@ export default function RootLayout({
           <ScrollToTop />
           <Navbar />
           <Sidebar />
-          <div className="mt-[64px] md:mt-[72px]">
+          <div className="mt-[64px] md:mt-[72px] flex flex-col min-h-[calc(100vh-72px)]">
             <CategoryNav />
-            <main>
+            <main className="flex-grow">
               {children}
             </main>
             <Footer />

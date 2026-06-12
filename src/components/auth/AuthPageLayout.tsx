@@ -42,6 +42,8 @@ export function AuthPageLayout({ title, subtitle, children, footer }: AuthPageLa
           {children}
         </div>
 
+        
+
         <div className="mt-6 text-center text-sm" style={{ color: 'var(--booking-text-muted)' }}>
           {footer}
         </div>
